@@ -1,26 +1,52 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* 1. Base del sitio (Dark Mode forzado) */
+  --background: #0a0a0a;
+  --foreground: #ededed;
+
+  /* 2. Nuestros colores personalizados (Morado y Calipso) */
+  --calypso-main: #06b6d4;
+  --calypso-glow: #22d3ee;
+  --purple-main: #6305b1;
+  --purple-glow: #802cce;
+
+  /* 3. Variables de shadcn/ui (Adaptadas al estilo Persona) */
+  --primary: 273 67% 39%; /* hsl para el morado */
+  --primary-foreground: 0 0% 100%;
+  
+  --secondary: 190 96% 37%; /* hsl para el calipso */
+  --secondary-foreground: 0 0% 0%;
+  
+  --muted: 270 20% 15%; /* Tonos grises tintados de morado oscuro */
+  --muted-foreground: 270 10% 65%;
+  
+  --border: 270 30% 15%; /* Bordes con un brillo morado sutil */
+  --input: 270 30% 15%;
+  --ring: 190 96% 37%; /* El anillo de focus (al hacer clic en un input) será calipso */
+  
+  /* ¡CLAVE PARA EL ESTILO JRPG! Todo afilado, 0 bordes redondos */
+  --radius: 0rem; 
 }
 
+/* Le decimos a Tailwind v4 que genere las clases para nuestros colores */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  
+  /* Esto crea las clases: bg-calypso-DEFAULT, text-calypso-DEFAULT, etc. */
+  --color-calypso-DEFAULT: var(--calypso-main);
+  --color-calypso-glow: var(--calypso-glow);
+  
+  --color-purple-DEFAULT: var(--purple-main);
+  --color-purple-glow: var(--purple-glow);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-geist-sans, Arial, Helvetica, sans-serif);
+  --font-mono: var(--font-geist-mono, monospace);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
 }
