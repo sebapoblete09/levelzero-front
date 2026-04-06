@@ -64,9 +64,11 @@ export default function LoginPage() {
           </ul>
 
           {/* Botón de Google */}
+         {/* Botón de Google */}
           <Button 
             onClick={handleGoogleLogin}
-            className="w-full group relative h-14 bg-white text-black hover:bg-calypso-DEFAULT rounded-none border-2 border-transparent hover:border-white transition-all overflow-hidden"
+            // Cambiamos rounded-none por rounded-xl y le dimos una sombra suave
+            className="w-full group relative h-14 bg-white text-black hover:bg-calypso-DEFAULT rounded-xl border-2 border-transparent hover:border-white transition-all overflow-hidden shadow-lg"
           >
             {/* Ícono de Google SVG */}
             <svg className="w-6 h-6 mr-3 relative z-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -77,7 +79,7 @@ export default function LoginPage() {
             </svg>
             <span className="font-bold text-lg relative z-10 uppercase tracking-wider">Continuar con Google</span>
             
-            {/* Efecto de barra diagonal al hacer hover */}
+            {/* El efecto diagonal al hover se mantiene gracias a overflow-hidden */}
             <div className="absolute inset-0 h-full w-0 bg-calypso-DEFAULT transform skew-x-[-20deg] -ml-4 transition-all duration-300 group-hover:w-[120%]" />
           </Button>
 
