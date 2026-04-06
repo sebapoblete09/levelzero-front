@@ -14,3 +14,10 @@ export type UserProfile = {
   created_at: string;
   updated_at: string;
 };
+
+export type UserUpdate = {
+  username: string;
+  display_name: string;
+  preferred_platforms: Platform[];
+  onboarding_completed: boolean;
+}
