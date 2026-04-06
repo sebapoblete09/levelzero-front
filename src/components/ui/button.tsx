@@ -19,6 +19,7 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
         link: "text-primary underline-offset-4 hover:underline",
+        persona: "bg-black border-2 border-purple-DEFAULT shadow-[8px_8px_0px_0px_var(--color-calypso-DEFAULT)] hover:bg-calypso-DEFAULT rounded-none uppercase font-bold transition-all",
       },
       size: {
         default:
