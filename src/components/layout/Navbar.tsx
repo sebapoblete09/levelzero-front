@@ -20,12 +20,14 @@ import { useRouter } from "next/navigation";
 // Usamos tu cliente de Supabase y el Contexto
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/providers/UserContext";
+import React, { useState } from "react";
 
 export default function Navbar() {
   // ¡El usuario ya viene cargado e instantáneo desde el Layout!
   const { user } = useUser(); 
   const router = useRouter();
   const supabase = createClient();
+  const [query, setQuery]= useState("");
 
   const handleLogout = async () => {
     // 1. Borramos la sesión en el navegador
@@ -35,6 +37,13 @@ export default function Navbar() {
     router.refresh(); 
     router.push("/login");
   };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if(query.trim().length >= 2) {
+      router.push(`/games?q=${encodeURIComponent(query.trim())}`);
+    }
+  }
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-purple-900/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -50,15 +59,22 @@ export default function Navbar() {
         {/* CENTRO: Buscador (Oculto en móvil, visible en md en adelante) */}
         <div className="hidden md:flex flex-1 items-center justify-center max-w-xl px-6">
           <div className="relative w-full">
-            <ButtonGroup className="w-full shadow-sm">
+            <form onSubmit={handleSearch} className="hidden md:flex flex-1 items-center justify-center max-w-xl px-6">
+              <ButtonGroup className="w-full shadow-sm">
               <Input 
                 placeholder="Buscar juegos, usuarios..." 
+                value={query}
+                onChange={(e)=>setQuery(e.target.value)}
                 className="rounded-l-xl border-purple-900/50 focus-visible:ring-calypso-DEFAULT bg-black/50" 
               />
-              <Button variant="outline" aria-label="Search" className="rounded-r-xl border-purple-900/50 hover:bg-calypso-DEFAULT hover:text-black">
+              <Button type="submit"
+              variant="outline" aria-label="Search" 
+              className="rounded-r-xl border-purple-900/50 hover:bg-calypso-DEFAULT hover:text-black">
                 <SearchIcon className="h-4 w-4" />
               </Button>
             </ButtonGroup>
+            </form>
+            
           </div>
         </div>
 
