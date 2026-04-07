@@ -34,19 +34,37 @@ export default function GamesResultsPage() {
         Resultados obtenidos para: <span className="text-calypso-DEFAULT">{q} : {data?.count}</span>
       </h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {data?.results.map((game) => (
-          <div key={game.id} className="bg-black border-2 border-purple-900 p-4 shadow-[8px_8px_0px_0px_rgba(0,240,255,0.2)]">
-             {/* Aquí renderizas tu GameCard */}
-             <p className="font-bold uppercase tracking-tighter">{game.name}</p>
-             <Image 
-              src={game.cover ? game.cover.url : "/placeholder.png"} 
-              alt={game.name}
-              width={300}
-              height={400}
-              className="w-full h-auto object-cover mt-2"
-             />
-          </div>
-        ))}
+        {data?.results.map((game) => {
+          // 1. Arreglamos la URL de la imagen
+          let imageUrl = "/placeholder.png"; // Imagen por defecto si no hay cover
+          
+          if (game.cover && game.cover.url) {
+            // Le agregamos el https: y cambiamos t_thumb por t_cover_big para mayor calidad
+            imageUrl = `https:${game.cover.url.replace('t_thumb', 't_cover_big')}`;
+          }
+
+          return (
+            <div key={game.id} className="bg-black border-2 border-purple-900 p-4 shadow-[8px_8px_0px_0px_var(--color-calypso-DEFAULT)] flex flex-col group">
+               
+               {/* Contenedor de la Imagen */}
+               <div className="relative aspect-[3/4] w-full overflow-hidden mb-4 border border-purple-900/50">
+                 <Image 
+                  src={imageUrl} 
+                  alt={`Portada de ${game.name}`}
+                  fill // 'fill' es mejor para responsive que width y height fijos
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                 />
+               </div>
+
+               {/* Título del Juego */}
+               <h2 className="font-bold uppercase tracking-tighter text-white mt-auto line-clamp-2" title={game.name}>
+                 {game.name}
+               </h2>
+               
+            </div>
+          );
+        })}
       </div>
 
       {data?.results.length === 0 && (
