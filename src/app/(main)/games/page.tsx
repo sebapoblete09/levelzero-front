@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { getGamesByName } from "@/actions/games";
 // Importa tus componentes de GameCard aquí
+import Image from "next/image";
 
 export default function GamesResultsPage() {
   const searchParams = useSearchParams();
@@ -37,6 +38,13 @@ export default function GamesResultsPage() {
           <div key={game.id} className="bg-black border-2 border-purple-900 p-4 shadow-[8px_8px_0px_0px_rgba(0,240,255,0.2)]">
              {/* Aquí renderizas tu GameCard */}
              <p className="font-bold uppercase tracking-tighter">{game.name}</p>
+             <Image 
+              src={game.cover ? game.cover.url : "/placeholder.png"} 
+              alt={game.name}
+              width={300}
+              height={400}
+              className="w-full h-auto object-cover mt-2"
+             />
           </div>
         ))}
       </div>
