@@ -5,7 +5,7 @@ type SubItem = {
 
 export type company = {
   id: number;
-  company: string;
+  company: SubItem;
 };
 
 export type GameType = {
