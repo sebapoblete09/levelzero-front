@@ -1,7 +1,13 @@
 // actions/user.ts
 "use server";
+
+
+
+
+
 import { revalidatePath } from "next/cache";
-import { UserUpdate } from "@/types/user";
+import { UserUpdate ,} from "@/types/user";
+import { UserGames } from "@/types/games";
 import { createClient } from "@/lib/supabase/server"; 
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -43,6 +49,44 @@ export async function getUserProfile() {
     return null;
   }
 }
+
+//Obtener los juegos del usuario
+export async function getUserGames() : Promise<UserGames[] | null> {
+  // 1. Instanciamos Supabase usando la función reutilizable
+  const supabase = await createClient();
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (!session) {
+    return null; // No está logueado
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/api/v1/library/me`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${session.access_token}`,
+      },
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      console.error("Error del backend:", await res.text());
+      return null;
+    }
+
+    // 4. Devolvemos los datos del usuario
+    const userData = await res.json();
+    return userData;
+
+  } catch (error) {
+    console.error("Error conectando con FastAPI:", error);
+    return null;
+  }
+}
+
+
 
 //Patch actualizar el perfil del usuario
 export async function updateUserProfile(data: UserUpdate){

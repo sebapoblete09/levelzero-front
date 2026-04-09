@@ -10,16 +10,17 @@ import { Game } from "@/types/games";
 export default async function GameDetailPage({
   params,
 }: {
-  params: { id: number };
+  params: { id: string };
 }) {
   // 1. Extraemos el ID de los parámetros y lo convertimos a número
-  const gameId = params.id;
+  const resolvedParams = await params;
+  const gameId = parseInt(resolvedParams.id, 10);
 
   // 2. Si alguien escribe texto en lugar de un número en la URL (/game/hola), lo atajamos
   if (isNaN(gameId)) {
     return (
       <div className="p-10 text-center text-red-500 font-mono">
-        ID de juego inválido.
+        ID de juego inválido. El valor recibido fue: {params.id}
       </div>
     );
   }
