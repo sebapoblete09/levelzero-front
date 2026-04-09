@@ -37,7 +37,7 @@ export default function GameCard({ game }: { game: GameCardType }) {
           {game.name}
         </h2>
 
-        <Button variant="persona"  onClick={()=>router.push(`/games/${game.id}`)}>+ Info</Button>
+        <Button variant="default"  onClick={()=>router.push(`/game/${game.id}`)}>+ Info</Button>
       </div>
     </div>
   );

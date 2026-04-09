@@ -1,3 +1,13 @@
+
+type SubItem = {
+    id: number;
+    name: string;
+}
+
+export type company = {
+    id: number;
+    company: string;
+}
 //Datos de un juego en especifico
 export type Game = {
     id: number;
@@ -5,9 +15,9 @@ export type Game = {
     summary: string | null;
     cover: Cover | null;
     first_release_date: number | null;
-    genres: string[];
-    platforms: string[];
-    involved_companies: string[];
+    genres: SubItem[];
+    platforms: SubItem[];
+    involved_companies: company[];
 };
 
 //Portada del juego
