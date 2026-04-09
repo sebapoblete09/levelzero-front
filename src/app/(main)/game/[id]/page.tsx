@@ -109,7 +109,7 @@ export default async function GameDetailPage({
                         key={company.id}
                         className="px-3 py-1 bg-black border border-purple-900/80 text-white font-mono text-xs uppercase shadow-[2px_2px_0px_0px_var(--color-purple-900)]"
                       >
-                        {company.company}
+                          {company.company.name}
                       </span>
                     ))
                 )}
