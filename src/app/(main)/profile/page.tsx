@@ -7,10 +7,12 @@ import { getUserGames} from "@/actions/user";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { UserGames } from "@/types/games";
 
 export default function ProfilePage() {
   const { user } = useUser();
   const router = useRouter();
+ 
 
   // Protección de ruta: Si no hay usuario en el contexto, al login
   useEffect(() => {
@@ -65,18 +67,18 @@ export default function ProfilePage() {
         ) : favorites && favorites.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
             
-            {favorites.map((game: any) => {
+            {favorites.map((game:UserGames) => {
               // Limpieza de URL de IGDB igual que antes
               let imageUrl = "/placeholder.png"; 
-              if (game.cover_url) {
-                imageUrl = `https:${game.cover_url.replace('t_thumb', 't_cover_big')}`;
+              if (game.cover) {
+                imageUrl = `https:${game.cover.replace('t_thumb', 't_cover_big')}`;
               }
 
               return (
                 <div key={game.id} className="relative aspect-[3/4] border-2 border-purple-900 group overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,0.5)]">
                   <Image 
                     src={imageUrl}
-                    alt={game.name}
+                    alt={game.game_title}
                     fill
                     sizes="(max-width: 768px) 50vw, 20vw"
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -84,7 +86,7 @@ export default function ProfilePage() {
                   {/* Overlay con el nombre al pasar el mouse (opcional) */}
                   <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2">
                      <span className="text-white font-bold text-xs uppercase truncate w-full block">
-                       {game.name}
+                       {game.game_title}
                      </span>
                   </div>
                 </div>

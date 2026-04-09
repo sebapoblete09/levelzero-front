@@ -4,7 +4,8 @@
 import React from "react";
 import { getGameById } from "@/actions/games";
 import Image from "next/image";
-import { Game } from "@/types/games";
+import {Game } from "@/types/games";
+import AddToListButton from "@/components/game/addGame";
 
 // En un Server Component, Next.js nos pasa los 'params' (como el ID de la URL) automáticamente
 export default async function GameDetailPage({
@@ -60,12 +61,8 @@ export default async function GameDetailPage({
       })
     : "Desconocida";
 
-  // 2. Extraemos los nombres de las compañías
-  const companiesList =
-    game.involved_companies && game.involved_companies.length > 0
-      ? game.involved_companies.map((c) => c.company).join(", ")
-      : "Desconocido";
 
+    
   return (
     <main className="container mx-auto p-4 sm:p-8 min-h-screen">
       <div className="bg-black border-2 border-purple-900 p-6 sm:p-10 shadow-[12px_12px_0px_0px_var(--color-calypso-DEFAULT)]">
@@ -84,12 +81,7 @@ export default async function GameDetailPage({
             </div>
 
             {/* Botón de Acción Principal (Placeholder para futuro) */}
-            <button className="w-full mt-6 relative h-14 bg-white text-black hover:bg-calypso-DEFAULT rounded-none border-2 border-transparent hover:border-white transition-all overflow-hidden group">
-              <span className="font-bold text-lg relative z-10 uppercase tracking-widest">
-                Añadir a Colección
-              </span>
-              <div className="absolute inset-0 h-full w-0 bg-calypso-DEFAULT transform skew-x-[-20deg] -ml-4 transition-all duration-300 group-hover:w-[120%]" />
-            </button>
+            <AddToListButton gameId={game.id} gameName={game.name} />
           </div>
 
           {/* Columna Derecha: Información */}
@@ -111,7 +103,16 @@ export default async function GameDetailPage({
                 <span className="text-muted-foreground mr-2 font-bold">
                   » Estudio:
                 </span>
-                {companiesList}
+                {game.involved_companies && game.involved_companies.length > 0 && (
+                    game.involved_companies.map((company) => (
+                      <span
+                        key={company.id}
+                        className="px-3 py-1 bg-black border border-purple-900/80 text-white font-mono text-xs uppercase shadow-[2px_2px_0px_0px_var(--color-purple-900)]"
+                      >
+                        {company.company}
+                      </span>
+                    ))
+                )}
               </div>
             </div>
 

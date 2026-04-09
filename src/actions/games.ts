@@ -57,7 +57,3 @@ export async function getGameById(id: number): Promise<Game | null> {
     return null;
   }
 }
-
-
-//añadir un juego a la lista de favoritos del usuario
-//export async function addGameToFavorites(gameId: number){
