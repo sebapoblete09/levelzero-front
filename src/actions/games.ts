@@ -40,9 +40,6 @@ export async function getGamesByName(name: string): Promise<SearchGame | null> {
 
 //Obtener un juego por su ID
 export async function getGameById(id: number): Promise<Game | null> {
-  
-  
-
   try {
     const res = await fetch(`${API_URL}/api/v1/games/game/${id}`, {
       method: "GET",
@@ -64,13 +61,3 @@ export async function getGameById(id: number): Promise<Game | null> {
 
 //añadir un juego a la lista de favoritos del usuario
 //export async function addGameToFavorites(gameId: number){
-//}
-/*const supabase = await createClient();
-
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (!session) {
-    return null; // No está logueado
-  }*/
