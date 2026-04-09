@@ -7,6 +7,12 @@ export type company = {
   id: number;
   company: string;
 };
+
+export type GameType = {
+  id: number;
+  type:string;
+}
+
 //Datos de un juego en especifico
 export type Game = {
   id: number;
@@ -29,6 +35,8 @@ export type GameCard = {
   id: number;
   name: string;
   cover: Cover | null;
+  platforms: SubItem[];
+  game_types: GameType;
 };
 
 //Lista de juegos obtenida de la API de FastAPI
@@ -55,3 +63,6 @@ export type UserGames = {
   status: Status;
   added_at: string | null;
 };
+
+
+
