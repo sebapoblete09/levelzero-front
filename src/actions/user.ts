@@ -6,14 +6,14 @@
 
 
 import { revalidatePath } from "next/cache";
-import { UserUpdate ,} from "@/types/user";
+import { UserProfile, UserUpdate ,} from "@/types/user";
 import { Status, UserGames } from "@/types/games";
 import { createClient } from "@/lib/supabase/server"; 
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 //Get Perfil del usuario registrado
-export async function getUserProfile() {
+export async function getUserProfile():Promise<UserProfile | null> {
   // 1. Instanciamos Supabase usando la función reutilizable
   const supabase = await createClient();
 
@@ -41,7 +41,7 @@ export async function getUserProfile() {
     }
 
     // 4. Devolvemos los datos del usuario
-    const userData = await res.json();
+    const userData: UserProfile = await res.json();
     return userData;
 
   } catch (error) {
