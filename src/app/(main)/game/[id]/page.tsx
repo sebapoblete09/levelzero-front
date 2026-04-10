@@ -1,11 +1,10 @@
-// IMPORTANTE: Quitamos el "use client" de la primera línea.
-// Ahora esto corre en el servidor de Next.js antes de llegar al navegador.
-
-import React from "react";
 import { getGameById } from "@/actions/games";
 import Image from "next/image";
 import {Game } from "@/types/games";
 import AddToListButton from "@/components/game/addGame";
+import noGame from "@/components/game/noGame";
+import { formatDate,formatCoverUrl } from "@/utils/game-helpers";
+;
 
 // En un Server Component, Next.js nos pasa los 'params' (como el ID de la URL) automáticamente
 export default async function GameDetailPage({
@@ -30,39 +29,17 @@ export default async function GameDetailPage({
   const game: Game | null = await getGameById(gameId);
 
   // 4. Si la base de datos no lo encuentra (devuelve null)
-  if (!game) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
-        <div className="border-2 border-red-500 p-8 shadow-[8px_8px_0px_0px_rgba(239,68,68,0.5)]">
-          <h1 className="text-2xl font-black italic text-red-500 uppercase">
-            Juego no encontrado
-          </h1>
-          <p className="text-muted-foreground font-mono mt-2">
-            El registro #{gameId} no existe en la base de datos.
-          </p>
-        </div>
-      </div>
-    );
+  if (!game) { 
+    return noGame(gameId);
   }
 
   // 5. Arreglamos la URL de la imagen de IGDB (igual que hicimos en los resultados)
-  let imageUrl = "/placeholder.png";
-  if (game.cover && game.cover.url) {
-    imageUrl = `https:${game.cover.url.replace("t_thumb", "t_cover_big")}`;
-  }
+  const imageUrl = formatCoverUrl(game.cover?.url);
 
   // 6. ¡Renderizamos el juego!
   // 1. Formateamos la fecha de lanzamiento (De Unix Timestamp a Texto Legible)
-  const formattedDate = game.first_release_date
-    ? new Date(game.first_release_date * 1000).toLocaleDateString("es-ES", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
-    : "Desconocida";
-
-
-    
+  const formattedDate = formatDate(game.first_release_date)
+ 
   return (
     <main className="container mx-auto p-4 sm:p-8 min-h-screen">
       <div className="bg-black border-2 border-purple-900 p-6 sm:p-10 shadow-[12px_12px_0px_0px_var(--color-calypso-DEFAULT)]">
@@ -80,7 +57,7 @@ export default async function GameDetailPage({
               />
             </div>
 
-            {/* Botón de Acción Principal (Placeholder para futuro) */}
+            {/* Botón de Acción Principal*/}
             <AddToListButton gameId={game.id} gameName={game.name} />
           </div>
 

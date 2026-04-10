@@ -4,7 +4,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { getGamesByName } from "@/actions/games";
-import Image from "next/image";
 import GameCard from "@/components/ui/game-card";
 
 export default function GamesResultsPage() {

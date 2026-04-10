@@ -4,13 +4,10 @@ import { GameCard as GameCardType } from "@/types/games";
 import Image from "next/image";
 import {useRouter} from "next/navigation";
 import {Button }from  "@/components/ui/button";
+import { formatCoverUrl } from "@/utils/game-helpers";
 export default function GameCard({ game }: { game: GameCardType }) {
   const router = useRouter();
-  let imageUrl = "/placeholder.png";
-
-  if (game.cover && game.cover.url) {
-    imageUrl = `https:${game.cover?.url.replace("t_thumb", "t_cover_big")}`;
-  }
+  const imageUrl = formatCoverUrl(game.cover?.url);
 
   return (
     <div

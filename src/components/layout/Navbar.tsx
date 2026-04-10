@@ -1,8 +1,4 @@
 "use client";
-
-
-
-
 import Link from "next/link";
 import { SearchIcon, X } from "lucide-react";
 import { ButtonGroup } from "@/components/ui/button-group";
