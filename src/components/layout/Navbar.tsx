@@ -140,7 +140,7 @@ export default function Navbar() {
                           {user.display_name || user.username}
                         </p>
                         <p className="text-xs leading-none text-muted-foreground font-mono">
-                          @{user.username || "nuevo_usuario"}
+                          {user.username || "nuevo_usuario"}
                         </p>
                       </div>
                     </DropdownMenuLabel>
@@ -148,7 +148,9 @@ export default function Navbar() {
                     
                     <DropdownMenuGroup>
                       <DropdownMenuItem className="cursor-pointer hover:bg-purple-900/30 text-white rounded-lg mx-1 my-1">
-                        Mi Perfil
+                        <Link href="/profile" className="block w-full h-full py-2 px-4">
+                          Mi Perfil
+                        </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem className="cursor-pointer hover:bg-purple-900/30 text-white rounded-lg mx-1 my-1">
                         Biblioteca
