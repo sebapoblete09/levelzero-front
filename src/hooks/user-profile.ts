@@ -1,7 +1,7 @@
 import { getUserGames } from "@/actions/user";
 import {useUser} from "@/providers/UserContext";
 import { useQuery } from "@tanstack/react-query";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export function userProfile() {
