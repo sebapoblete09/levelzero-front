@@ -1,19 +1,39 @@
 // app/(main)/profile/page.tsx
 "use client";
 
+import { useUser } from "@/providers/UserContext"; // Importa tu contexto
+import { useQuery } from "@tanstack/react-query";
+import { getUserGames} from "@/actions/user";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { UserGames } from "@/types/games";
-import { userProfile } from "@/hooks/user-profile";
 import ProfileHeader from "@/components/profile/profileHeader";
 import GameCard from "@/components/ui/game-library-card";
 
 export default function ProfilePage() {
-  
- const {user,games,isLoading} = userProfile();
+  const { user } = useUser();
+  const router = useRouter();
+ 
+
+  // Protección de ruta: Si no hay usuario en el contexto, al login
+  useEffect(() => {
+    if (user === null) {
+      router.push("/login");
+    }
+  }, [user, router]);
+
+  // Obtenemos los favoritos usando TanStack Query
+  const { data: favorites, isLoading } = useQuery({
+    // La 'queryKey' es única. Así, si navega a otro lado y vuelve, carga de la caché.
+    queryKey: ["userGames", user?.username], 
+    queryFn: () => getUserGames(),
+    // IMPORTANTE: enabled asegura que no intente buscar en la DB si el usuario aún no carga
+    enabled: !!user, 
+    staleTime: 1000 * 60 * 5, // Caché de 5 minutos
+  });
 
   // Mientras carga el contexto del usuario (evita pantallazos raros)
-  if (isLoading || !user) {
-    return <div className="p-10 text-white font-mono">Cargando perfil...</div>;
-  }
+  if (!user) return null; 
 
   return (
     <main className="container mx-auto p-4 sm:p-8 min-h-screen">
@@ -31,13 +51,13 @@ export default function ProfilePage() {
           <div className="text-calypso-DEFAULT font-mono animate-pulse uppercase">
             Cargando base de datos personal...
           </div>
-        ) : games && games.length > 0 ? (
+        ) : favorites && favorites.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
             
-            {games.map((game:UserGames) => {
-              return <GameCard key={game.igdb_id} game={game} />       
-            })}
-            
+            {favorites.map((game:UserGames) => (
+              // Limpieza de URL de IGDB igual que antes
+              <GameCard key={game.id} game={game} />
+            ))}
           </div>
         ) : (
           <div className="bg-purple-900/10 border border-purple-900 p-8 text-center border-dashed">
