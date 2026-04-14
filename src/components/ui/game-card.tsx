@@ -1,40 +1,176 @@
 "use client";
 
-import { GameCard as GameCardType } from "@/types/games";
+import { status } from "@/types/games";
+import { owner } from "@/types/library";
 import Image from "next/image";
-import {useRouter} from "next/navigation";
-import {Button }from  "@/components/ui/button";
-import { formatCoverUrl } from "@/utils/game-helpers";
-export default function GameCard({ game }: { game: GameCardType }) {
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+
+export interface GameData {
+  id: number;
+  name: string;
+  cover: string;
+  platform: string[];
+  ownership?: owner; //string
+  status?: status; //string
+  added_at?: string | null;
+  game_type?: string | null;
+}
+export default function GameCard({ game }: { game: GameData }) {
   const router = useRouter();
-  const imageUrl = formatCoverUrl(game.cover?.url);
+
+  const getStatusColor = (status?: status) => {
+    switch (status) {
+      case "playing":
+        return "border-calypso-DEFAULT text-calypso-DEFAULT";
+      case "want_to_play":
+        return "border-purple-400 text-purple-400";
+      case "completed":
+        return "border-green-400 text-green-400";
+      case "on_hold":
+        return "border-yellow-400 text-yellow-400";
+      case "dropped":
+        return "border-red-500 text-red-500";
+      default:
+        return "border-gray-400 text-gray-400";
+    }
+  };
+
+  const getOwnershipColor = (ownership?: owner) => {
+    switch (ownership) {
+      case "physical":
+        return "border-blue-400 text-blue-400";
+      case "digital":
+        return "border-cyan-400 text-cyan-400";
+      case "none":
+        return "border-gray-400 text-gray-400";
+      default:
+        return "border-gray-400 text-gray-400";
+    }
+  };
+
+  const getStatusLabel = (status?: status) => {
+    switch (status) {
+      case "playing":
+        return "Jugando";
+      case "want_to_play":
+        return "Pendiente";
+      case "completed":
+        return "Completado";
+      case "on_hold":
+        return "En Pausa";
+      case "dropped":
+        return "Abandonado";
+      default:
+        return "Sin Estado";
+    }
+  };
+
+  const getOwnershipLabel = (ownership?: owner) => {
+    switch (ownership) {
+      case "physical":
+        return "Físico";
+      case "digital":
+        return "Digital";
+      case "none":
+        return "Ninguno";
+      default:
+        return "Ninguno";
+    }
+  };
 
   return (
-    <div
-      className="bg-black border-2 border-purple-900 p-3 sm:p-4 shadow-[6px_6px_0px_0px_var(--color-calypso-DEFAULT)] sm:shadow-[8px_8px_0px_0px_var(--color-calypso-DEFAULT)] flex flex-row sm:flex-col group gap-4 sm:gap-0"
-    >
+    <div className="bg-black border-2 border-purple-900 p-3 shadow-[4px_4px_0px_0px_var(--color-calypso-DEFAULT)] flex flex-col group hover:shadow-[6px_6px_0px_0px_var(--color-calypso-DEFAULT)] transition-shadow duration-300">
       {/* Contenedor de la Imagen */}
-      <div className="relative shrink-0 w-24 sm:w-full aspect-[3/4] overflow-hidden sm:mb-4 border border-purple-900/50">
+      <div className="relative w-full aspect-[3/4] overflow-hidden mb-3 border border-purple-900/50">
         <Image
-          src={imageUrl}
+          src={game.cover}
           alt={`Portada de ${game.name}`}
           fill
-          sizes="(max-width: 768px) 96px, (max-width: 1200px) 50vw, 25vw"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
           className="object-cover transition-transform duration-300 group-hover:scale-105"
         />
+
+        {(game.status || game.ownership) && (
+          <div className="absolute left-3 top-3 z-20 flex flex-wrap gap-2">
+            {game.status && (
+              <span
+                className={`px-2 py-1 border text-[10px] font-mono uppercase ${getStatusColor(game.status)} bg-black/80`}
+              >
+                {getStatusLabel(game.status)}
+              </span>
+            )}
+            {game.ownership && (
+              <span
+                className={`px-2 py-1 border text-[10px] font-mono uppercase ${getOwnershipColor(game.ownership)} bg-black/80`}
+              >
+                {getOwnershipLabel(game.ownership)}
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Contenedor del Texto */}
-      {/* 3. Ocupa el espacio sobrante con flex-1 y centra el texto verticalmente en móvil */}
-      <div className="flex flex-col flex-2 justify-center sm:justify-end sm:mt-auto">
+      <div className="flex flex-col flex-1">
         <h2
-          className="font-bold uppercase tracking-tighter text-white sm:line-clamp-2 line-clamp-3 text-sm sm:text-base"
+          className="font-bold uppercase tracking-tighter text-white line-clamp-2 text-sm mb-2"
           title={game.name}
         >
           {game.name}
         </h2>
 
-        <Button variant="default"  onClick={()=>router.push(`/game/${game.id}`)}>+ Info</Button>
+        {/* Plataformas */}
+        {game.platform && game.platform.length > 0 && (
+          <div className="mb-2">
+            <div className="flex flex-wrap gap-1">
+              {game.platform.slice(0, 3).map((platform, index) => (
+                <span
+                  key={index}
+                  className="px-1.5 py-0.5 bg-purple-900/20 border border-calypso-DEFAULT/50 text-calypso-DEFAULT font-mono text-xs uppercase"
+                >
+                  {platform}
+                </span>
+              ))}
+              {game.platform.length > 3 && (
+                <span className="px-1.5 py-0.5 bg-purple-900/20 border border-calypso-DEFAULT/50 text-calypso-DEFAULT font-mono text-xs uppercase">
+                  +{game.platform.length - 3}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Información adicional */}
+        <div className="space-y-1 mb-2 text-xs text-gray-400 font-mono">
+          {game.game_type && (
+            <div className="flex items-center gap-1">
+              <span className="text-muted-foreground">Tipo:</span>
+              <span className="text-white uppercase">{game.game_type}</span>
+            </div>
+          )}
+          {game.added_at && (
+            <div className="flex items-center gap-1">
+              <span className="text-muted-foreground">Añadido:</span>
+              <span className="text-white">
+                {new Date(game.added_at).toLocaleDateString("es-ES", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Botón de acción */}
+        <Button
+          variant="default"
+          onClick={() => router.push(`/game/${game.id}`)}
+          className="w-full mt-auto text-xs py-1.5"
+        >
+          + Info
+        </Button>
       </div>
     </div>
   );

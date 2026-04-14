@@ -1,7 +1,6 @@
 // actions/games.ts
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
 import { SearchGame, Game } from "@/types/games";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;

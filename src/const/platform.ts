@@ -1,5 +1,4 @@
-import {Platform} from "@/types/user";
-
+import { Platform } from "@/types/user";
 
 export const platforms: Platform[] = [
   { id: 1, name: "PC" },
