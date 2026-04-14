@@ -1,43 +1,11 @@
-type SubItem = {
+//Card de un juego
+export interface GameCard {
   id: number;
   name: string;
-};
-
-export type company = {
-  id: number;
-  company: SubItem;
-};
-
-export type GameType = {
-  id: number;
-  type:string;
+  cover: string;
+  platforms: string[] | [];
+  game_type: string | "";
 }
-
-//Datos de un juego en especifico
-export type Game = {
-  id: number;
-  name: string;
-  summary: string | null;
-  cover: Cover | null;
-  first_release_date: number | null;
-  genres: SubItem[];
-  platforms: SubItem[];
-  involved_companies: company[];
-};
-
-//Portada del juego
-export type Cover = {
-  url: string;
-};
-
-//Card de un juego que se mostrara al buscar
-export type GameCard = {
-  id: number;
-  name: string;
-  cover: Cover | null;
-  platforms: SubItem[];
-  game_types: GameType;
-};
 
 //Lista de juegos obtenida de la API de FastAPI
 export type SearchGame = {
@@ -46,14 +14,36 @@ export type SearchGame = {
   results: GameCard[];
 };
 
-export type Status =
+export type status =
   | "want_to_play"
   | "playing"
   | "on_hold"
   | "completed"
   | "dropped";
 
-export type UserGames = {
+export type lan_support = {
+  name: string;
+  supports: string[];
+};
+//Detalles de un Juego
+export interface Game extends GameCard {
+  alternative_names: string[] | null;
+  firs_release_date: number | null;
+  franchises: string[] | [];
+  game_modes: string[] | [];
+  genres: string[] | [];
+  involved_companies: string[] | [];
+  library_status: status | null;
+  player_perspectives: string[] | [];
+  rating: number | null;
+  screenshots: string[] | [];
+  storyline: string;
+  summary: string;
+  videos: string[] | [];
+  language_supports: lan_support[] | [];
+}
+
+/*export type UserGames = {
   id: string;
   user_id: string;
   igdb_id: number;
@@ -62,7 +52,4 @@ export type UserGames = {
   platform: SubItem[];
   status: Status;
   added_at: string | null;
-};
-
-
-
+};*/
