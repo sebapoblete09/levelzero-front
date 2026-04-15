@@ -50,7 +50,7 @@ export async function getGameById(id: number): Promise<Game | null> {
     headers["Authorization"] = `Bearer ${session.access_token}`;
   }
   try {
-    const res = await fetch(`${API_URL}/api/v1/games/game/${id}&limit=5`, {
+    const res = await fetch(`${API_URL}/api/v1/games/game/${id}`, {
       method: "GET",
       headers: headers,
       cache: "no-store",
