@@ -3,6 +3,8 @@ import Image from "next/image";
 import { Game } from "@/types/games";
 import AddToListButton from "@/components/game/addGame";
 import noGame from "@/components/game/noGame";
+import CollapsibleLanguages from "@/components/game/CollapsibleLanguages";
+import CollapsibleSection from "@/components/game/CollapsibleSection";
 import { formatDate } from "@/utils/game-helpers";
 // En un Server Component, Next.js nos pasa los 'params' (como el ID de la URL) automáticamente
 export default async function GameDetailPage({
@@ -38,15 +40,15 @@ export default async function GameDetailPage({
   return (
     <main className="container mx-auto p-4 sm:p-8 min-h-screen">
       <div className="bg-black border-2 border-purple-900 p-6 sm:p-10 shadow-[12px_12px_0px_0px_var(--color-calypso-DEFAULT)]">
-        <div className="flex flex-col md:flex-row gap-8 sm:gap-12">
+        <div className="flex flex-col md:flex-row gap-8 sm:gap-12 items-center text-center md:items-start md:text-left">
           {/* Columna Izquierda: Portada */}
-          <div className="w-full md:w-1/3 shrink-0">
+          <div className="w-full md:w-1/5 shrink-0 mx-auto md:mx-0">
             <div className="relative aspect-[3/4] w-full border-4 border-purple-900 overflow-hidden group">
               <Image
                 src={game.cover}
                 alt={`Portada de ${game.name}`}
                 fill
-                sizes="(max-width: 768px) 100vw, 33vw"
+                sizes="(max-width: 768px) 100vw, 20vw"
                 className="object-cover transition-transform duration-500 group-hover:scale-105"
                 priority
               />
@@ -92,11 +94,7 @@ export default async function GameDetailPage({
             )}
             {/* Géneros */}
             {game.genres && game.genres.length > 0 && (
-              <div className="mt-6 pt-6 border-t border-purple-900/30">
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-3 flex items-center gap-2">
-                  <span className="w-2 h-2 bg-calypso-DEFAULT inline-block" />
-                  Géneros
-                </h3>
+              <CollapsibleSection title="Géneros">
                 <div className="flex flex-wrap gap-2">
                   {game.genres.map((genre, index) => (
                     <span
@@ -107,15 +105,12 @@ export default async function GameDetailPage({
                     </span>
                   ))}
                 </div>
-              </div>
+              </CollapsibleSection>
             )}
 
             {/* Franquicias */}
             {game.franchises && game.franchises.length > 0 && (
-              <div className="mt-6 pt-6 border-t border-purple-900/30">
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-3">
-                  Franquicias
-                </h3>
+              <CollapsibleSection title="Franquicias">
                 <div className="flex flex-wrap gap-2">
                   {game.franchises.map((franchise, index) => (
                     <span
@@ -126,84 +121,63 @@ export default async function GameDetailPage({
                     </span>
                   ))}
                 </div>
-              </div>
+              </CollapsibleSection>
             )}
 
             {/* Modos de Juego y Perspectivas */}
-            <div className="mt-6 pt-6 border-t border-purple-900/30">
-              {/* Modos de Juego */}
-              {game.game_modes && game.game_modes.length > 0 && (
-                <div className="mb-6">
-                  <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-3">
-                    Modos de Juego
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {game.game_modes.map((mode, index) => (
-                      <span
-                        key={index}
-                        className="px-3 py-1 bg-black border border-purple-900/80 text-white font-mono text-xs uppercase shadow-[2px_2px_0px_0px_var(--color-purple-900)]"
-                      >
-                        {mode}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Perspectivas de Jugador */}
-              {game.player_perspectives &&
-                game.player_perspectives.length > 0 && (
-                  <div>
+            <CollapsibleSection title="Game Modes">
+              <div>
+                {/* Modos de Juego */}
+                {game.game_modes && game.game_modes.length > 0 && (
+                  <div className="mb-6">
                     <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-3">
-                      Perspectivas
+                      Modos de Juego
                     </h3>
                     <div className="flex flex-wrap gap-2">
-                      {game.player_perspectives.map((perspective, index) => (
+                      {game.game_modes.map((mode, index) => (
                         <span
                           key={index}
                           className="px-3 py-1 bg-black border border-purple-900/80 text-white font-mono text-xs uppercase shadow-[2px_2px_0px_0px_var(--color-purple-900)]"
                         >
-                          {perspective}
+                          {mode}
                         </span>
                       ))}
                     </div>
                   </div>
                 )}
-            </div>
 
-            {/* Lenguajes Soportados */}
-            {game.language_supports && game.language_supports.length > 0 && (
-              <div className="mt-6 pt-6 border-t border-purple-900/30">
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-3">
-                  Idiomas
-                </h3>
-                <div className="flex flex-col gap-3">
-                  {game.language_supports.map((lang, index) => (
-                    <div key={index}>
-                      <h4 className="text-xs font-bold text-white uppercase mb-2">
-                        {lang.name}
-                      </h4>
-                      <div className="flex flex-wrap gap-1">
-                        {lang.supports.map((support, idx) => (
+                {/* Perspectivas de Jugador */}
+                {game.player_perspectives &&
+                  game.player_perspectives.length > 0 && (
+                    <div>
+                      <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-3">
+                        Perspectivas
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {game.player_perspectives.map((perspective, index) => (
                           <span
-                            key={idx}
-                            className="px-2 py-1 bg-purple-900/20 border border-calypso-DEFAULT/50 text-calypso-DEFAULT font-mono text-[10px] uppercase"
+                            key={index}
+                            className="px-3 py-1 bg-black border border-purple-900/80 text-white font-mono text-xs uppercase shadow-[2px_2px_0px_0px_var(--color-purple-900)]"
                           >
-                            {support}
+                            {perspective}
                           </span>
                         ))}
                       </div>
                     </div>
-                  ))}
-                </div>
+                  )}
               </div>
+            </CollapsibleSection>
+
+            {/* Lenguajes Soportados */}
+            {game.language_supports && game.language_supports.length > 0 && (
+              <CollapsibleLanguages languageSupports={game.language_supports} />
             )}
           </div>
 
           {/* Columna Derecha: Información */}
           <div className="w-full md:w-2/3 flex flex-col justify-start">
             {/* Título Principal */}
-            <h1 className="text-4xl sm:text-6xl font-black italic uppercase tracking-tighter text-white mb-2">
+            <h1 className="hidden md:block text-4xl sm:text-6xl font-black italic uppercase tracking-tighter text-white mb-2">
               {game.name}
             </h1>
 
@@ -233,10 +207,7 @@ export default async function GameDetailPage({
             </div>
 
             {/* Resumen del juego */}
-            <div className="mb-8">
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-3">
-                Sinopsis
-              </h3>
+            <CollapsibleSection title="Sinopsis">
               {game.summary ? (
                 <div className="prose prose-invert max-w-none">
                   <p className="text-base sm:text-lg text-gray-300 leading-relaxed">
@@ -248,43 +219,34 @@ export default async function GameDetailPage({
                   Sin descripción disponible en la base de datos.
                 </p>
               )}
-            </div>
+            </CollapsibleSection>
 
             {/* Storyline */}
             {game.storyline && (
-              <div className="mb-8">
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-3">
-                  Historia
-                </h3>
+              <CollapsibleSection title="Historia">
                 <div className="prose prose-invert max-w-none">
                   <p className="text-base sm:text-lg text-gray-300 leading-relaxed">
                     {game.storyline}
                   </p>
                 </div>
-              </div>
+              </CollapsibleSection>
             )}
 
             {/* Rating */}
             {game.rating && (
-              <div className="mb-8">
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-3">
-                  Puntuación
-                </h3>
+              <CollapsibleSection title="Puntuación">
                 <div className="flex items-center gap-2">
                   <span className="text-2xl font-bold text-calypso-DEFAULT">
                     {Math.round(game.rating)}
                   </span>
                   <span className="text-sm text-gray-400">/ 100</span>
                 </div>
-              </div>
+              </CollapsibleSection>
             )}
 
             {/* Alternative Names */}
             {game.alternative_names && game.alternative_names.length > 0 && (
-              <div className="mb-8">
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-3">
-                  Nombres Alternativos
-                </h3>
+              <CollapsibleSection title="Nombres Alternativos">
                 <div className="flex flex-wrap gap-2">
                   {game.alternative_names.map((name, index) => (
                     <span
@@ -295,7 +257,7 @@ export default async function GameDetailPage({
                     </span>
                   ))}
                 </div>
-              </div>
+              </CollapsibleSection>
             )}
 
             {/* Screenshots */}
