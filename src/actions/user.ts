@@ -186,6 +186,7 @@ export async function addGameToLibrary(
       body: JSON.stringify({
         ownership: addData.ownership,
         status: addData.status,
+        raiting: addData.raiting,
       }),
     });
 
@@ -217,6 +218,59 @@ export async function addGameToLibrary(
     return { success: true, gameData: gameData };
   } catch (error) {
     console.error("[DEBUG] addGameToLibrary - Error de conexión:", error);
+    return {
+      success: false,
+      error: "Error de conexión con el servidor backend.",
+    };
+  }
+}
+
+// actualizar juego en la biblioteca del usuario
+export async function updateGameToLibrary(
+  gameId: number,
+  addData: addGame,
+): Promise<{
+  success: boolean;
+  gameData?: GameLibrary;
+  error?: null | string;
+}> {
+  const supabase = await createClient();
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (!session) {
+    return { success: false, error: "No está logueado." };
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/api/v1/library/${gameId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({
+        ownership: addData.ownership,
+        status: addData.status,
+        rating: addData.raiting,
+      }),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      return {
+        success: false,
+        error:
+          errorData.detail || "Error al actualizar el juego en la biblioteca.",
+      };
+    }
+
+    const gameData = await res.json();
+    return { success: true, gameData };
+  } catch (error) {
+    console.error("[DEBUG] updateGameToLibrary - Error de conexión:", error);
     return {
       success: false,
       error: "Error de conexión con el servidor backend.",

@@ -1,3 +1,5 @@
+import { owner } from "./library";
+
 //Card de un juego
 export interface GameCard {
   id: number;
@@ -28,12 +30,13 @@ export type lan_support = {
 //Detalles de un Juego
 export interface Game extends GameCard {
   alternative_names: string[] | null;
-  firs_release_date: number | null;
+  first_release_date: number | null;
   franchises: string[] | [];
   game_modes: string[] | [];
   genres: string[] | [];
   involved_companies: string[] | [];
   library_status: status | null;
+  ownership: owner | null;
   player_perspectives: string[] | [];
   rating: number | null;
   screenshots: string[] | [];
@@ -42,14 +45,3 @@ export interface Game extends GameCard {
   videos: string[] | [];
   language_supports: lan_support[] | [];
 }
-
-/*export type UserGames = {
-  id: string;
-  user_id: string;
-  igdb_id: number;
-  game_title: string;
-  cover: string;
-  platform: SubItem[];
-  status: Status;
-  added_at: string | null;
-};*/
