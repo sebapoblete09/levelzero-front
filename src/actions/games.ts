@@ -1,6 +1,7 @@
 // actions/games.ts
 "use server";
 
+import { createClient } from "@/lib/supabase/server";
 import { SearchGame, Game } from "@/types/games";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -39,9 +40,19 @@ export async function getGamesByName(name: string): Promise<SearchGame | null> {
 
 //Obtener un juego por su ID
 export async function getGameById(id: number): Promise<Game | null> {
+  const headers: HeadersInit = {};
+  const supabase = await createClient();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (session) {
+    headers["Authorization"] = `Bearer ${session.access_token}`;
+  }
   try {
-    const res = await fetch(`${API_URL}/api/v1/games/game/${id}`, {
+    const res = await fetch(`${API_URL}/api/v1/games/game/${id}&limit=5`, {
       method: "GET",
+      headers: headers,
       cache: "no-store",
     });
 
@@ -50,6 +61,7 @@ export async function getGameById(id: number): Promise<Game | null> {
       return null;
     }
     const GameData: Game = await res.json();
+    console.log(GameData);
     return GameData;
   } catch (error) {
     console.error("Error conectando con FastAPI:", error);

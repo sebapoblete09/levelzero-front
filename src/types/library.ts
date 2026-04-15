@@ -1,5 +1,7 @@
 import { status } from "./games";
+
 export type owner = "none" | "physical" | "digital";
+
 export interface GameLibrary {
   id: string;
   user_id: string;
@@ -10,10 +12,12 @@ export interface GameLibrary {
   ownership: owner;
   status: status;
   added_at: string | null;
-  game_type?: string | null;
+  game_type: string | null;
+  raiting: number;
 }
 
 export interface addGame {
   ownership: owner;
   status: status;
+  raiting: number;
 }

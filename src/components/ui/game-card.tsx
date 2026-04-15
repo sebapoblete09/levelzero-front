@@ -80,29 +80,29 @@ export default function GameCard({ game }: { game: GameData }) {
   };
 
   return (
-    <div className="bg-black border-2 border-purple-900 p-3 shadow-[4px_4px_0px_0px_var(--color-calypso-DEFAULT)] flex flex-col group hover:shadow-[6px_6px_0px_0px_var(--color-calypso-DEFAULT)] transition-shadow duration-300">
+    <div className="bg-black border-2 border-purple-900 p-3 shadow-[4px_4px_0px_0px_var(--color-calypso-DEFAULT)] flex flex-row sm:flex-col group hover:shadow-[6px_6px_0px_0px_var(--color-calypso-DEFAULT)] transition-shadow duration-300 relative">
       {/* Contenedor de la Imagen */}
-      <div className="relative w-full aspect-[3/4] overflow-hidden mb-3 border border-purple-900/50">
+      <div className="relative w-24 h-32 sm:w-full sm:h-64 overflow-hidden mx-auto mb-2 border border-purple-900/50 flex-shrink-0">
         <Image
           src={game.cover}
           alt={`Portada de ${game.name}`}
           fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
+          sizes="(max-width: 768px) 96px, (max-width: 1200px) 192px, 192px"
+          className="object-cover object-center transition-transform duration-300 group-hover:scale-105"
         />
 
         {(game.status || game.ownership) && (
-          <div className="absolute left-3 top-3 z-20 flex flex-wrap gap-2">
+          <div className="absolute left-1 top-1 sm:left-3 sm:top-3 z-20 flex flex-wrap gap-1 sm:gap-2">
             {game.status && (
               <span
-                className={`px-2 py-1 border text-[10px] font-mono uppercase ${getStatusColor(game.status)} bg-black/80`}
+                className={`px-1 sm:px-2 py-0.5 sm:py-1 border text-[8px] sm:text-[10px] font-mono uppercase ${getStatusColor(game.status)} bg-black/80`}
               >
                 {getStatusLabel(game.status)}
               </span>
             )}
             {game.ownership && (
               <span
-                className={`px-2 py-1 border text-[10px] font-mono uppercase ${getOwnershipColor(game.ownership)} bg-black/80`}
+                className={`px-1 sm:px-2 py-0.5 sm:py-1 border text-[8px] sm:text-[10px] font-mono uppercase ${getOwnershipColor(game.ownership)} bg-black/80`}
               >
                 {getOwnershipLabel(game.ownership)}
               </span>
@@ -112,7 +112,7 @@ export default function GameCard({ game }: { game: GameData }) {
       </div>
 
       {/* Contenedor del Texto */}
-      <div className="flex flex-col flex-1">
+      <div className="flex flex-col flex-1 relative min-w-0 ">
         <h2
           className="font-bold uppercase tracking-tighter text-white line-clamp-2 text-sm mb-2"
           title={game.name}
@@ -124,7 +124,7 @@ export default function GameCard({ game }: { game: GameData }) {
         {game.platform && game.platform.length > 0 && (
           <div className="mb-2">
             <div className="flex flex-wrap gap-1">
-              {game.platform.slice(0, 3).map((platform, index) => (
+              {game.platform.slice(0, 2).map((platform, index) => (
                 <span
                   key={index}
                   className="px-1.5 py-0.5 bg-purple-900/20 border border-calypso-DEFAULT/50 text-calypso-DEFAULT font-mono text-xs uppercase"
@@ -132,9 +132,9 @@ export default function GameCard({ game }: { game: GameData }) {
                   {platform}
                 </span>
               ))}
-              {game.platform.length > 3 && (
+              {game.platform.length > 2 && (
                 <span className="px-1.5 py-0.5 bg-purple-900/20 border border-calypso-DEFAULT/50 text-calypso-DEFAULT font-mono text-xs uppercase">
-                  +{game.platform.length - 3}
+                  +{game.platform.length - 2}
                 </span>
               )}
             </div>
@@ -162,14 +162,15 @@ export default function GameCard({ game }: { game: GameData }) {
             </div>
           )}
         </div>
-
-        {/* Botón de acción */}
+      </div>
+      <div className="mb-2">
+        {/* Botón de acción pequeño en esquina inferior derecha */}
         <Button
           variant="default"
           onClick={() => router.push(`/game/${game.id}`)}
-          className="w-full mt-auto text-xs py-1.5"
+          className="absolute bottom-0 right-0 text-lg p-1"
         >
-          + Info
+          + info
         </Button>
       </div>
     </div>

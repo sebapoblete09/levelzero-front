@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { X, Loader2 } from "lucide-react";
-import { addGameToLibrary } from "@/actions/user";
+import { addGameToLibrary, updateGameToLibrary } from "@/actions/user";
 import { status } from "@/types/games";
 import { addGame, owner } from "@/types/library";
 
@@ -12,6 +12,7 @@ interface AddToListButtonProps {
   isInLibrary?: boolean;
   currentStatus?: status;
   currentOwnership?: owner;
+  currentRaiting?: number | null;
 }
 
 export default function AddToListButton({
@@ -20,12 +21,15 @@ export default function AddToListButton({
   isInLibrary = false,
   currentStatus,
   currentOwnership,
+  currentRaiting,
 }: AddToListButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [data, setData] = useState<addGame>({
     ownership: currentOwnership || "none",
     status: currentStatus || "want_to_play",
+    raiting: currentRaiting || 1,
   });
   // Mapeo de estados con estilos de acento para el modal
   const statusOptions: { value: status; label: string; accent: string }[] = [
@@ -74,24 +78,34 @@ export default function AddToListButton({
     },
   ];
 
+  const ratingOptions = Array.from({ length: 10 }, (_, i) => i + 1);
+
   const handleChange = (name: string, value: string) => {
     setData((prevData) => ({
       ...prevData,
-      [name]: value,
+      [name]: name === "raiting" ? parseInt(value) : value,
     }));
   };
 
   const handleData = async (addData: addGame) => {
     setIsSubmitting(true);
 
-    // Llamada a tu Server Action que ahora solo requiere ID y Status
-    const result = await addGameToLibrary(gameId, addData);
+    const result = isInLibrary
+      ? await updateGameToLibrary(gameId, addData)
+      : await addGameToLibrary(gameId, addData);
 
     if (result.success) {
       console.log(
         `[SISTEMA] ${gameName} ${isInLibrary ? "actualizado" : "agregado"} a: ${addData.ownership}, ${addData.status}`,
       );
-      setIsOpen(false);
+      setSuccessMessage(
+        `${gameName} ${isInLibrary ? "actualizado" : "agregado"} exitosamente a tu colección.`,
+      );
+      // Cerrar después de 3 segundos
+      setTimeout(() => {
+        setIsOpen(false);
+        setSuccessMessage(null);
+      }, 3000);
     } else {
       alert(
         `Error al ${isInLibrary ? "actualizar" : "agregar"} el juego a la biblioteca: ${result.error}`,
@@ -124,7 +138,7 @@ export default function AddToListButton({
           />
 
           {/* Contenedor del Modal */}
-          <div className="relative z-10 bg-black border-2 border-purple-900 p-6 sm:p-8 max-w-sm w-full shadow-[12px_12px_0px_0px_var(--color-calypso-DEFAULT)] animate-in zoom-in-95 duration-200">
+          <div className="relative z-10 bg-black border-2 border-purple-900 p-6 sm:p-8 max-w-sm md:max-w-4xl w-full shadow-[12px_12px_0px_0px_var(--color-calypso-DEFAULT)] animate-in zoom-in-95 duration-200">
             {/* Cerrar */}
             {!isSubmitting && (
               <button
@@ -142,92 +156,132 @@ export default function AddToListButton({
               ID_TARGET: {gameId} {gameName}
             </p>
 
-            {/* Ownership Options */}
-            <div className="mb-6">
-              <h3 className="text-sm font-bold uppercase text-white mb-3">
-                Propiedad
-              </h3>
-              <div className="flex flex-col gap-2">
-                {ownershipOptions.map((option) => (
-                  <button
-                    key={option.value}
-                    onClick={() => handleChange("ownership", option.value)}
-                    disabled={isSubmitting}
-                    className={`
-                      relative w-full px-4 py-3 bg-black text-white font-mono font-bold uppercase text-xs text-left 
-                      border-2 border-purple-900/40 transition-all group overflow-hidden
-                      ${option.accent} 
-                      disabled:opacity-50 disabled:cursor-not-allowed
-                      ${data.ownership === option.value ? "border-white text-white" : ""}
-                    `}
-                  >
-                    <span className="relative z-10 flex items-center justify-between">
-                      {option.label}
-                      {data.ownership === option.value && (
-                        <span className="text-[9px]">[SELECCIONADO]</span>
-                      )}
-                    </span>
-                    <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </button>
-                ))}
+            {successMessage ? (
+              <div className="text-center py-8">
+                <p className="text-green-400 font-bold text-lg">
+                  {successMessage}
+                </p>
               </div>
-            </div>
-
-            {/* Status Options */}
-            <div className="mb-6">
-              <h3 className="text-sm font-bold uppercase text-white mb-3">
-                Estado
-              </h3>
-              <div className="flex flex-col gap-3">
-                {statusOptions.map((option) => (
-                  <button
-                    key={option.value}
-                    onClick={() => handleChange("status", option.value)}
-                    disabled={isSubmitting}
-                    className={`
-                      relative w-full px-4 py-4 bg-black text-white font-mono font-bold uppercase text-xs text-left 
-                      border-2 border-purple-900/40 transition-all group overflow-hidden
-                      ${option.accent} 
-                      disabled:opacity-50 disabled:cursor-not-allowed
-                      ${data.status === option.value ? "border-white text-white" : ""}
-                    `}
-                  >
-                    <span className="relative z-10 flex items-center justify-between">
-                      {option.label}
-                      {isSubmitting ? (
-                        <Loader2 className="w-4 h-4 animate-spin text-calypso-DEFAULT" />
-                      ) : (
-                        <span className="text-[9px] opacity-0 group-hover:opacity-100 transition-opacity">
-                          [EXECUTE]
+            ) : (
+              <div className="grid md:grid-cols-3 gap-6">
+                {/* Ownership Options */}
+                <div className="mb-6 md:mb-0">
+                  <h3 className="text-sm font-bold uppercase text-white mb-3">
+                    Propiedad
+                  </h3>
+                  <div className="flex flex-col gap-2">
+                    {ownershipOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        onClick={() => handleChange("ownership", option.value)}
+                        disabled={isSubmitting}
+                        className={`
+                          relative w-full px-4 py-3 bg-black text-white font-mono font-bold uppercase text-xs text-left 
+                          border-2 border-purple-900/40 transition-all group overflow-hidden
+                          ${option.accent} 
+                          disabled:opacity-50 disabled:cursor-not-allowed
+                          ${data.ownership === option.value ? "border-white text-white" : ""}
+                        `}
+                      >
+                        <span className="relative z-10 flex items-center justify-between">
+                          {option.label}
+                          {data.ownership === option.value && (
+                            <span className="text-[9px]">[SELECCIONADO]</span>
+                          )}
                         </span>
-                      )}
-                    </span>
-                    <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </button>
-                ))}
+                        <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Status Options */}
+                <div className="mb-6 md:mb-0">
+                  <h3 className="text-sm font-bold uppercase text-white mb-3">
+                    Estado
+                  </h3>
+                  <div className="flex flex-col gap-3">
+                    {statusOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        onClick={() => handleChange("status", option.value)}
+                        disabled={isSubmitting}
+                        className={`
+                          relative w-full px-4 py-4 bg-black text-white font-mono font-bold uppercase text-xs text-left 
+                          border-2 border-purple-900/40 transition-all group overflow-hidden
+                          ${option.accent} 
+                          disabled:opacity-50 disabled:cursor-not-allowed
+                          ${data.status === option.value ? "border-white text-white" : ""}
+                        `}
+                      >
+                        <span className="relative z-10 flex items-center justify-between">
+                          {option.label}
+                          {isSubmitting ? (
+                            <Loader2 className="w-4 h-4 animate-spin text-calypso-DEFAULT" />
+                          ) : (
+                            <span className="text-[9px] opacity-0 group-hover:opacity-100 transition-opacity">
+                              [EXECUTE]
+                            </span>
+                          )}
+                        </span>
+                        <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Rating Options */}
+                <div className="mb-6 md:mb-0">
+                  <h3 className="text-sm font-bold uppercase text-white mb-3">
+                    Rating
+                  </h3>
+                  <div className="grid grid-cols-5 gap-2">
+                    {ratingOptions.map((rating) => (
+                      <button
+                        key={rating}
+                        onClick={() =>
+                          handleChange("raiting", rating.toString())
+                        }
+                        disabled={isSubmitting}
+                        className={`
+                          relative px-3 py-3 bg-black text-white font-mono font-bold uppercase text-xs 
+                          border-2 border-purple-900/40 transition-all group overflow-hidden
+                          hover:border-yellow-400 hover:text-yellow-400
+                          disabled:opacity-50 disabled:cursor-not-allowed
+                          ${data.raiting === rating ? "border-yellow-400 text-yellow-400" : ""}
+                        `}
+                      >
+                        <span className="relative z-10">{rating}</span>
+                        <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Submit Button */}
-            <button
-              onClick={() => handleData(data)}
-              disabled={isSubmitting}
-              className="w-full mt-4 relative h-12 bg-calypso-DEFAULT text-black hover:bg-white rounded-none border-2 border-transparent hover:border-calypso-DEFAULT transition-all overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <span className="font-bold text-sm relative z-10 uppercase tracking-widest">
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin inline mr-2" />
-                    {isInLibrary ? "Actualizando..." : "Agregando..."}
-                  </>
-                ) : isInLibrary ? (
-                  "Actualizar Estado"
-                ) : (
-                  "Agregar Juego"
-                )}
-              </span>
-              <div className="absolute inset-0 h-full w-0 bg-white transform skew-x-[-20deg] -ml-4 transition-all duration-300 group-hover:w-[120%]" />
-            </button>
+            {!successMessage && (
+              <button
+                onClick={() => handleData(data)}
+                disabled={isSubmitting}
+                className="w-full mt-4 relative h-12 bg-calypso-DEFAULT text-black hover:bg-white rounded-none border-2 border-transparent hover:border-calypso-DEFAULT transition-all overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <span className="font-bold text-sm relative z-10 uppercase tracking-widest">
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin inline mr-2" />
+                      {isInLibrary ? "Actualizando..." : "Agregando..."}
+                    </>
+                  ) : isInLibrary ? (
+                    "Actualizar Estado"
+                  ) : (
+                    "Agregar Juego"
+                  )}
+                </span>
+                <div className="absolute inset-0 h-full w-0 bg-white transform skew-x-[-20deg] -ml-4 transition-all duration-300 group-hover:w-[120%]" />
+              </button>
+            )}
 
             {/* Decoración estética de los bordes */}
             <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-calypso-DEFAULT" />
