@@ -80,7 +80,7 @@ export default function GameCard({ game }: { game: GameData }) {
   };
 
   return (
-    <div className="bg-black border-2 border-purple-900 p-3 shadow-[4px_4px_0px_0px_var(--color-calypso-DEFAULT)] flex flex-row sm:flex-col group hover:shadow-[6px_6px_0px_0px_var(--color-calypso-DEFAULT)] transition-shadow duration-300 relative">
+    <div className="bg-black border-2 border-purple-900 p-3 shadow-[4px_4px_0px_0px_var(--color-calypso-DEFAULT)] flex flex-row gap-4 sm:flex-col group hover:shadow-[6px_6px_0px_0px_var(--color-calypso-DEFAULT)] transition-shadow duration-300 relative">
       {/* Contenedor de la Imagen */}
       <div className="relative w-24 h-32 sm:w-full sm:h-64 overflow-hidden mx-auto mb-2 border border-purple-900/50 flex-shrink-0">
         <Image
@@ -168,7 +168,7 @@ export default function GameCard({ game }: { game: GameData }) {
         <Button
           variant="default"
           onClick={() => router.push(`/game/${game.id}`)}
-          className="absolute bottom-0 right-0 text-lg p-1"
+          className="absolute bottom-2 right-2 text-lg p-2"
         >
           + info
         </Button>

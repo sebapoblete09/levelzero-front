@@ -5,15 +5,18 @@ import { useUser } from "@/providers/UserContext";
 import { useQuery } from "@tanstack/react-query";
 import { getUserGames } from "@/actions/user";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import ProfileHeader from "@/components/profile/profileHeader";
+import EditProfileModal from "@/components/profile/EditProfileModal";
 import GameCard from "@/components/ui/game-card";
 import { GameLibrary } from "@/types/library";
 import { libraryGameData } from "@/utils/game-helpers";
+import Link from "next/link";
 
 export default function ProfilePage() {
   const { user } = useUser();
   const router = useRouter();
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   useEffect(() => {
     if (user === null) {
@@ -23,7 +26,7 @@ export default function ProfilePage() {
 
   const { data: favorites, isLoading } = useQuery({
     queryKey: ["userGames", user?.username],
-    queryFn: () => getUserGames(),
+    queryFn: () => getUserGames({ limit: 5 }),
     enabled: !!user,
     staleTime: 1000 * 60 * 5,
   });
@@ -32,19 +35,30 @@ export default function ProfilePage() {
 
   return (
     <main className="container mx-auto p-4 sm:p-12 min-h-screen">
-      <ProfileHeader userData={user} />
+      <ProfileHeader
+        userData={user}
+        onEditClick={() => setIsEditModalOpen(true)}
+      />
+
+      <EditProfileModal
+        userData={user}
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+      />
 
       <section className="mb-10 mt-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between mb-6 px-4">
           <div>
             <h2 className="text-3xl sm:text-4xl font-black uppercase text-white tracking-tighter mt-3">
-              Últimos agregados sin completar
+              Últimos juegos agregados
             </h2>
           </div>
-          <p className="max-w-xl text-sm text-gray-400">
-            Estos son los juegos que tienes en tu lista y todavía no están
-            marcados como completados.
-          </p>
+          <Link
+            href="/library"
+            className="inline-flex items-center justify-center w-auto rounded-lg border-2 border-calypso-DEFAULT bg-calypso-DEFAULT px-4 py-2 text-xs font-bold uppercase text-black transition-all hover:bg-transparent hover:text-calypso-DEFAULT ml-auto"
+          >
+            Ir a la biblioteca
+          </Link>
         </div>
 
         {isLoading ? (
@@ -63,8 +77,7 @@ export default function ProfilePage() {
               Nada pendiente por completar
             </p>
             <p className="text-muted-foreground">
-              Cuando añadas juegos a tu biblioteca, aparecerán aquí los que aún
-              no terminaste.
+              Aca Aapareceran tus ultimos juegos agregados
             </p>
           </div>
         )}

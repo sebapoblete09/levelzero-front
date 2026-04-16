@@ -39,6 +39,7 @@ export async function getUserProfile(): Promise<UserProfile | null> {
 
     // 4. Devolvemos los datos del usuario
     const userData: UserProfile = await res.json();
+    console.log(userData);
     return userData;
   } catch (error) {
     console.error("Error conectando con FastAPI:", error);
@@ -46,8 +47,15 @@ export async function getUserProfile(): Promise<UserProfile | null> {
   }
 }
 
+interface GetUserGamesParams {
+  limit?: number;
+  status?: string;
+  ownership?: string;
+}
 //Obtener los juegos del usuario
-export async function getUserGames(): Promise<GameLibrary[] | null> {
+export async function getUserGames(
+  params?: GetUserGamesParams
+): Promise<GameLibrary[] | null> {
   // 1. Instanciamos Supabase usando la función reutilizable
   const supabase = await createClient();
 
@@ -60,7 +68,20 @@ export async function getUserGames(): Promise<GameLibrary[] | null> {
   }
 
   try {
-    const res = await fetch(`${API_URL}/api/v1/library/me`, {
+    const url = new URL(`${API_URL}/api/v1/library/me`);
+
+    // 3. Agregamos los query params dinámicamente solo si vienen definidos
+    if (params?.limit) {
+      url.searchParams.append("limit", params.limit.toString());
+    }
+    if (params?.status) {
+      url.searchParams.append("status", params.status);
+    }
+    if (params?.ownership) {
+      url.searchParams.append("ownership", params.ownership);
+    }
+    // Pasamos url.toString() al fetch para que incluya los parámetros
+    const res = await fetch(url.toString(), {
       method: "GET",
       headers: {
         Authorization: `Bearer ${session.access_token}`,
