@@ -1,8 +1,18 @@
-import Link from "next/link";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UserProfile } from "@/types/user";
+import { Button } from "@/components/ui/button";
+import { Edit } from "lucide-react";
 
-export default function ProfileHeader({ userData }: { userData: UserProfile }) {
+interface ProfileHeaderProps {
+  userData: UserProfile;
+  onEditClick?: () => void;
+}
+
+export default function ProfileHeader({
+  userData,
+  onEditClick,
+}: ProfileHeaderProps) {
   return (
     <div className="bg-zinc-950 border border-purple-900/70 rounded-[2rem] p-6 flex flex-col md:flex-row items-center md:items-start gap-6">
       <div className="relative w-32 h-32 rounded-full border-4 border-calypso-DEFAULT overflow-hidden shadow-[0_0_0_4px_rgb(79,70,229)]">
@@ -28,16 +38,38 @@ export default function ProfileHeader({ userData }: { userData: UserProfile }) {
             </span>
           </p>
           <p className="text-calypso-DEFAULT font-mono">{userData?.email}</p>
+          {userData?.preferred_platforms &&
+            userData.preferred_platforms.length > 0 && (
+              <div className="mt-3">
+                <p className="text-xs font-bold uppercase tracking-wider text-calypso-DEFAULT mb-2">
+                  Plataformas preferidas
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {userData.preferred_platforms.map((platform, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1 bg-purple-900/20 border border-calypso-DEFAULT/50 text-calypso-DEFAULT font-mono text-xs uppercase shadow-[2px_2px_0px_0px_var(--color-calypso-DEFAULT)]"
+                    >
+                      {platform}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
         </div>
       </div>
 
-      <div className="w-full md:w-auto">
-        <Link
-          href="/library"
-          className="inline-flex items-center justify-center w-full rounded-lg border-2 border-calypso-DEFAULT bg-calypso-DEFAULT px-6 py-3 text-sm font-bold uppercase text-black transition-all hover:bg-transparent hover:text-calypso-DEFAULT"
-        >
-          Ir a la biblioteca
-        </Link>
+      <div className="w-full md:w-auto flex flex-col sm:flex-row gap-3">
+        {onEditClick && (
+          <Button
+            onClick={onEditClick}
+            className="inline-flex items-center justify-center w-full rounded-lg border-2 border-purple-900/80 bg-transparent px-6 py-3 text-sm font-bold uppercase text-white transition-all hover:border-calypso-DEFAULT hover:text-calypso-DEFAULT"
+          >
+            <Edit className="w-4 h-4 mr-2" />
+            Editar Perfil
+          </Button>
+        )}
+        
       </div>
     </div>
   );
