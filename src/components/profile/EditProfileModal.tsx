@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { UserProfile, Platform, UserUpdate } from "@/types/user";
 import { platforms } from "@/const/platform";
 import { updateUserProfile } from "@/actions/user";
+import { useUser } from "@/providers/UserContext";
 
 interface EditProfileModalProps {
   userData: UserProfile;
@@ -35,6 +36,7 @@ export default function EditProfileModal({
     ),
     onboarding_completed: userData.onboarding_completed,
   });
+  const { setUser } = useUser();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -102,6 +104,8 @@ export default function EditProfileModal({
       setError(result?.error || "Error al actualizar el perfil.");
       return;
     }
+
+    setUser(result.data);
 
     setShowSuccess(true);
     setTimeout(() => {
