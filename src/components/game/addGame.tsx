@@ -1,10 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { X, Loader2 } from "lucide-react";
+import { X } from "lucide-react";
 import { addGameToLibrary, updateGameToLibrary } from "@/actions/user";
 import { status } from "@/types/games";
 import { addGame, owner } from "@/types/library";
+import { ModalTrigger } from "./addGameComponents/modalTrigger";
+import { SelectionGroup } from "./addGameComponents/selectionGroup";
+import { OWNERSHIP_OPTIONS, STATUS_OPTIONS } from "@/const/addGame";
+import { RatingGroup } from "./addGameComponents/ratingGroup";
+import { SubmitButton } from "./addGameComponents/submitButton";
 
 interface AddToListButtonProps {
   gameId: number;
@@ -26,270 +31,128 @@ export default function AddToListButton({
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  // Nota: Corregí el mapeo interno de "raiting" a "rating" para mantener consistencia
   const [data, setData] = useState<addGame>({
     ownership: currentOwnership || "none",
     status: currentStatus || "want_to_play",
-    raiting: currentRaiting || 1,
+    rating: currentRaiting || 1,
   });
-  // Mapeo de estados con estilos de acento para el modal
-  const statusOptions: { value: status; label: string; accent: string }[] = [
-    {
-      value: "playing",
-      label: "Jugando Ahora",
-      accent: "hover:border-calypso-DEFAULT hover:text-calypso-DEFAULT",
-    },
-    {
-      value: "want_to_play",
-      label: "Pendiente (Backlog)",
-      accent: "hover:border-purple-400 hover:text-purple-400",
-    },
-    {
-      value: "completed",
-      label: "Completado",
-      accent: "hover:border-green-400 hover:text-green-400",
-    },
-    {
-      value: "on_hold",
-      label: "En Pausa",
-      accent: "hover:border-yellow-400 hover:text-yellow-400",
-    },
-    {
-      value: "dropped",
-      label: "Abandonado",
-      accent: "hover:border-red-500 hover:text-red-500",
-    },
-  ];
 
-  const ownershipOptions: { value: string; label: string; accent: string }[] = [
-    {
-      value: "none",
-      label: "Ninguno",
-      accent: "hover:border-gray-400 hover:text-gray-400",
-    },
-    {
-      value: "physical",
-      label: "Físico",
-      accent: "hover:border-blue-400 hover:text-blue-400",
-    },
-    {
-      value: "digital",
-      label: "Digital",
-      accent: "hover:border-cyan-400 hover:text-cyan-400",
-    },
-  ];
-
-  const ratingOptions = Array.from({ length: 10 }, (_, i) => i + 1);
-
-  const handleChange = (name: string, value: string) => {
-    setData((prevData) => ({
-      ...prevData,
-      [name]: name === "raiting" ? parseInt(value) : value,
-    }));
+  const handleChange = (name: keyof addGame, value: string | number) => {
+    setData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleData = async (addData: addGame) => {
+  const handleData = async () => {
     setIsSubmitting(true);
 
-    const result = isInLibrary
-      ? await updateGameToLibrary(gameId, addData)
-      : await addGameToLibrary(gameId, addData);
+    try {
+      const result = isInLibrary
+        ? await updateGameToLibrary(gameId, data)
+        : await addGameToLibrary(gameId, data);
 
-    if (result.success) {
-      console.log(
-        `[SISTEMA] ${gameName} ${isInLibrary ? "actualizado" : "agregado"} a: ${addData.ownership}, ${addData.status}`,
-      );
-      setSuccessMessage(
-        `${gameName} ${isInLibrary ? "actualizado" : "agregado"} exitosamente a tu colección.`,
-      );
-      // Cerrar después de 3 segundos
-      setTimeout(() => {
-        setIsOpen(false);
-        setSuccessMessage(null);
-      }, 3000);
-    } else {
-      alert(
-        `Error al ${isInLibrary ? "actualizar" : "agregar"} el juego a la biblioteca: ${result.error}`,
-      );
+      if (result.success) {
+        console.log(
+          `[SISTEMA] ${gameName} ${isInLibrary ? "actualizado" : "agregado"} a: ${data.ownership}, ${data.status}`,
+        );
+        setSuccessMessage(
+          `${gameName} ${isInLibrary ? "actualizado" : "agregado"} exitosamente.`,
+        );
+        setTimeout(() => {
+          setIsOpen(false);
+          setSuccessMessage(null);
+        }, 3000);
+      } else {
+        alert(
+          `Error al ${isInLibrary ? "actualizar" : "agregar"} el juego: ${result.error}`,
+        );
+      }
+    } catch (error) {
+      console.error("Error en la petición:", error);
+      alert("Ocurrió un error inesperado al procesar la solicitud.");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setIsSubmitting(false);
   };
 
   return (
     <>
-      {/* BOTÓN PRINCIPAL (EL QUE DISPARA EL MODAL) */}
-      <button
-        onClick={() => setIsOpen(true)}
-        className="w-full mt-6 relative h-14 bg-white text-black hover:bg-calypso-DEFAULT rounded-none border-2 border-transparent hover:border-white transition-all overflow-hidden group"
-      >
-        <span className="font-bold text-lg relative z-10 uppercase tracking-widest">
-          {isInLibrary ? "Editar Estado" : "Añadir a Colección"}
-        </span>
-        <div className="absolute inset-0 h-full w-0 bg-calypso-DEFAULT transform skew-x-[-20deg] -ml-4 transition-all duration-300 group-hover:w-[120%]" />
-      </button>
+      <ModalTrigger onClick={() => setIsOpen(true)} isInLibrary={isInLibrary} />
 
-      {/* OVERLAY Y MODAL */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 ">
           {/* Backdrop con Blur */}
           <div
             className="absolute inset-0 bg-black/90 backdrop-blur-md animate-in fade-in duration-300"
             onClick={() => !isSubmitting && setIsOpen(false)}
           />
 
-          {/* Contenedor del Modal */}
-          <div className="relative z-10 bg-black border-2 border-purple-900 p-6 sm:p-8 max-w-sm md:max-w-4xl w-full shadow-[12px_12px_0px_0px_var(--color-calypso-DEFAULT)] animate-in zoom-in-95 duration-200">
-            {/* Cerrar */}
+          {/* Contenedor del Modal Responsivo */}
+          <div className="overflow-x-hidden relative z-10 bg-black border-2 border-purple-900 p-6 sm:p-8 w-full max-w-[95vw] md:max-w-2xl lg:max-w-4xl max-h-[90vh] overflow-y-auto shadow-none md:shadow-[12px_12px_0px_0px_var(--color-calypso-DEFAULT)] scrollbar-thin scrollbar-thumb-purple-900 animate-in zoom-in-95 duration-200">
+            {" "}
             {!isSubmitting && (
               <button
                 onClick={() => setIsOpen(false)}
-                className="absolute top-4 right-4 text-purple-900 hover:text-red-500 transition-colors"
+                className="absolute top-4 right-4 text-purple-900 hover:text-red-500 transition-colors p-2"
+                aria-label="Cerrar modal"
               >
                 <X className="w-6 h-6" />
               </button>
             )}
-
-            <h2 className="text-xl font-black uppercase italic tracking-tighter text-white mb-1">
-              {isInLibrary ? "Editar Estado" : "Agregar a Colección"}
-            </h2>
-            <p className="text-calypso-DEFAULT font-mono text-[10px] uppercase mb-6 border-b border-purple-900/50 pb-4">
-              ID_TARGET: {gameId} {gameName}
-            </p>
-
+            <div className="pr-8">
+              <h2 className="text-xl sm:text-2xl font-black uppercase italic tracking-tighter text-white mb-1 break-words">
+                {isInLibrary ? "Editar Estado" : "Agregar a Colección"}
+              </h2>
+              <p className="text-calypso-DEFAULT font-mono text-[10px] sm:text-xs uppercase mb-6 border-b border-purple-900/50 pb-4 break-words">
+                ID_TARGET: {gameId} {gameName}
+              </p>
+            </div>
             {successMessage ? (
-              <div className="text-center py-8">
-                <p className="text-green-400 font-bold text-lg">
+              <div className="text-center py-12">
+                <p className="text-green-400 font-bold text-lg animate-pulse">
                   {successMessage}
                 </p>
               </div>
             ) : (
-              <div className="grid md:grid-cols-3 gap-6">
-                {/* Ownership Options */}
-                <div className="mb-6 md:mb-0">
-                  <h3 className="text-sm font-bold uppercase text-white mb-3">
-                    Propiedad
-                  </h3>
-                  <div className="flex flex-col gap-2">
-                    {ownershipOptions.map((option) => (
-                      <button
-                        key={option.value}
-                        onClick={() => handleChange("ownership", option.value)}
-                        disabled={isSubmitting}
-                        className={`
-                          relative w-full px-4 py-3 bg-black text-white font-mono font-bold uppercase text-xs text-left 
-                          border-2 border-purple-900/40 transition-all group overflow-hidden
-                          ${option.accent} 
-                          disabled:opacity-50 disabled:cursor-not-allowed
-                          ${data.ownership === option.value ? "border-white text-white" : ""}
-                        `}
-                      >
-                        <span className="relative z-10 flex items-center justify-between">
-                          {option.label}
-                          {data.ownership === option.value && (
-                            <span className="text-[9px]">[SELECCIONADO]</span>
-                          )}
-                        </span>
-                        <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </button>
-                    ))}
-                  </div>
+              <div className="flex flex-col h-full">
+                {/* Grilla Responsiva: 1 col móvil, 2 cols tablet, 3 cols desktop */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                  <SelectionGroup
+                    title="Propiedad"
+                    options={OWNERSHIP_OPTIONS}
+                    currentValue={data.ownership}
+                    onChange={(val) => handleChange("ownership", val)}
+                    disabled={isSubmitting}
+                  />
+
+                  <SelectionGroup
+                    title="Estado"
+                    options={STATUS_OPTIONS}
+                    currentValue={data.status}
+                    onChange={(val) => handleChange("status", val)}
+                    disabled={isSubmitting}
+                    isSubmitting={isSubmitting}
+                  />
+
+                  <RatingGroup
+                    currentValue={data.rating}
+                    onChange={(val) => handleChange("rating", val)}
+                    disabled={isSubmitting}
+                  />
                 </div>
 
-                {/* Status Options */}
-                <div className="mb-6 md:mb-0">
-                  <h3 className="text-sm font-bold uppercase text-white mb-3">
-                    Estado
-                  </h3>
-                  <div className="flex flex-col gap-3">
-                    {statusOptions.map((option) => (
-                      <button
-                        key={option.value}
-                        onClick={() => handleChange("status", option.value)}
-                        disabled={isSubmitting}
-                        className={`
-                          relative w-full px-4 py-4 bg-black text-white font-mono font-bold uppercase text-xs text-left 
-                          border-2 border-purple-900/40 transition-all group overflow-hidden
-                          ${option.accent} 
-                          disabled:opacity-50 disabled:cursor-not-allowed
-                          ${data.status === option.value ? "border-white text-white" : ""}
-                        `}
-                      >
-                        <span className="relative z-10 flex items-center justify-between">
-                          {option.label}
-                          {isSubmitting ? (
-                            <Loader2 className="w-4 h-4 animate-spin text-calypso-DEFAULT" />
-                          ) : (
-                            <span className="text-[9px] opacity-0 group-hover:opacity-100 transition-opacity">
-                              [EXECUTE]
-                            </span>
-                          )}
-                        </span>
-                        <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Rating Options */}
-                <div className="mb-6 md:mb-0">
-                  <h3 className="text-sm font-bold uppercase text-white mb-3">
-                    Rating
-                  </h3>
-                  <div className="grid grid-cols-5 gap-2">
-                    {ratingOptions.map((rating) => (
-                      <button
-                        key={rating}
-                        onClick={() =>
-                          handleChange("raiting", rating.toString())
-                        }
-                        disabled={isSubmitting}
-                        className={`
-                          relative px-3 py-3 bg-black text-white font-mono font-bold uppercase text-xs 
-                          border-2 border-purple-900/40 transition-all group overflow-hidden
-                          hover:border-yellow-400 hover:text-yellow-400
-                          disabled:opacity-50 disabled:cursor-not-allowed
-                          ${data.raiting === rating ? "border-yellow-400 text-yellow-400" : ""}
-                        `}
-                      >
-                        <span className="relative z-10">{rating}</span>
-                        <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </button>
-                    ))}
-                  </div>
+                <div className="mt-auto pt-4">
+                  <SubmitButton
+                    onClick={handleData}
+                    isSubmitting={isSubmitting}
+                    isInLibrary={isInLibrary}
+                  />
                 </div>
               </div>
             )}
-
-            {/* Submit Button */}
-            {!successMessage && (
-              <button
-                onClick={() => handleData(data)}
-                disabled={isSubmitting}
-                className="w-full mt-4 relative h-12 bg-calypso-DEFAULT text-black hover:bg-white rounded-none border-2 border-transparent hover:border-calypso-DEFAULT transition-all overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <span className="font-bold text-sm relative z-10 uppercase tracking-widest">
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin inline mr-2" />
-                      {isInLibrary ? "Actualizando..." : "Agregando..."}
-                    </>
-                  ) : isInLibrary ? (
-                    "Actualizar Estado"
-                  ) : (
-                    "Agregar Juego"
-                  )}
-                </span>
-                <div className="absolute inset-0 h-full w-0 bg-white transform skew-x-[-20deg] -ml-4 transition-all duration-300 group-hover:w-[120%]" />
-              </button>
-            )}
-
-            {/* Decoración estética de los bordes */}
-            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-calypso-DEFAULT" />
           </div>
         </div>
       )}
     </>
   );
 }
-
-//agregar para elegir si lo tiene o no, y si es fisico o digital

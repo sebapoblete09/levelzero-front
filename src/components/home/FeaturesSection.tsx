@@ -18,9 +18,9 @@ const FEATURES_ACTIVE = [
   },
   {
     icon: "◇",
-    title: "Sistema de Rating",
+    title: "Sistema de Rating y reseñas",
     description:
-      "Puntúa cada juego del 1 al 10. Tu escala personal, sin algoritmos externos que distorsionen tu criterio.",
+      "Puntúa cada juego del 1 al 10. Tu escala personal, ademas de tu reseña para cada juego.",
     tag: "Disponible",
   },
   {
@@ -65,7 +65,10 @@ const FEATURES_SOON = [
 
 export default function FeaturesSection() {
   return (
-    <section className="relative bg-background py-24 lg:py-32 overflow-hidden">
+    <section
+      id="Features"
+      className="relative bg-background py-24 lg:py-32 overflow-hidden"
+    >
       {/* Fondo punteado */}
       <div className="absolute inset-0 opacity-[0.025] pointer-events-none bg-[radial-gradient(circle,rgba(255,255,255,1)_2px,transparent_2px)] bg-[size:16px_16px]" />
 
@@ -74,7 +77,7 @@ export default function FeaturesSection() {
         <div className="mb-16 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
           <div>
             <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-calypso-DEFAULT mb-3">
-               02 · Funcionalidades
+              02 · Funcionalidades
             </p>
             <h2 className="text-4xl sm:text-5xl font-black italic uppercase tracking-tighter text-white leading-none">
               Todo lo que

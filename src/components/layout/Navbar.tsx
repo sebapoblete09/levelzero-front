@@ -76,13 +76,11 @@ export default function Navbar() {
           /* VISTA NORMAL (Logo + Buscador Desktop + Avatar) */
           <>
             {/* IZQUIERDA: Logo */}
-
-            <span
-              onClick={handleLogout}
-              className="text-xl sm:text-2xl font-black italic tracking-tighter text-white"
-            >
-              LEVEL<span className="text-calypso-DEFAULT">ZERO</span>
-            </span>
+            <Link href="/">
+              <span className="text-xl sm:text-2xl font-black italic tracking-tighter text-white">
+                LEVEL<span className="text-calypso-DEFAULT">ZERO</span>
+              </span>
+            </Link>
 
             {/* CENTRO: Buscador Desktop (Oculto en móvil, visible en md en adelante) */}
             <div className="hidden md:flex flex-1 items-center justify-center max-w-xl px-6">

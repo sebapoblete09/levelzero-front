@@ -1,26 +1,18 @@
 // src/app/(main)/page.tsx
-// Server Component — sin 'use client' deliberadamente
-// Cada sección se importa como componente independiente
 
-import HeroSection from "@/components/home/HeroSection";
-import FeaturesSection from "@/components/home/FeaturesSection";
-import IGDBSection from "@/components/home/IGDBSection";
-import PricingSection from "@/components/home/PricingSection";
+import Home from "@/components/home/Homepage";
+import UserDashboard from "@/components/userHome/UserHome";
+import { getUserProfile } from "@/actions/user";
 
-export default function Home() {
-  return (
-    <main className="bg-background text-foreground overflow-hidden">
-      {/* 01 · Hero */}
-      <HeroSection />
+export default async function HomePage() {
+  // Le preguntamos al servidor directamente si hay alguien logueado
+  const userProfile = await getUserProfile();
 
-      {/* 02 · Funcionalidades */}
-      <FeaturesSection />
+  // Si hay usuario (y sabemos que si llegó aquí ya pasó el onboarding gracias a tu layout)
+  if (userProfile) {
+    return <UserDashboard />;
+  }
 
-      {/* 03 · Powered by IGDB */}
-      <IGDBSection />
-
-      {/* 04 · Planes */}
-      <PricingSection />
-    </main>
-  );
+  // Si es un visitante casual o no hay sesión
+  return <Home />;
 }
