@@ -4,11 +4,11 @@ import { revalidatePath } from "next/cache";
 import { UserProfile, UserUpdate } from "@/types/user";
 import { addGame, GameLibrary } from "@/types/library";
 import { createClient } from "@/lib/supabase/server";
-
+import { cache } from "react";
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 //Get Perfil del usuario registrado
-export async function getUserProfile(): Promise<UserProfile | null> {
+export const getUserProfile = cache(async (): Promise<UserProfile | null> => {
   // 1. Instanciamos Supabase usando la función reutilizable
   const supabase = await createClient();
 
@@ -45,7 +45,7 @@ export async function getUserProfile(): Promise<UserProfile | null> {
     console.error("Error conectando con FastAPI:", error);
     return null;
   }
-}
+});
 
 interface GetUserGamesParams {
   limit?: number;
@@ -54,7 +54,7 @@ interface GetUserGamesParams {
 }
 //Obtener los juegos del usuario
 export async function getUserGames(
-  params?: GetUserGamesParams
+  params?: GetUserGamesParams,
 ): Promise<GameLibrary[] | null> {
   // 1. Instanciamos Supabase usando la función reutilizable
   const supabase = await createClient();
@@ -207,7 +207,7 @@ export async function addGameToLibrary(
       body: JSON.stringify({
         ownership: addData.ownership,
         status: addData.status,
-        raiting: addData.raiting,
+        rating: addData.rating,
       }),
     });
 
@@ -275,7 +275,7 @@ export async function updateGameToLibrary(
       body: JSON.stringify({
         ownership: addData.ownership,
         status: addData.status,
-        rating: addData.raiting,
+        rating: addData.rating,
       }),
     });
 

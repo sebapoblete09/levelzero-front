@@ -13,11 +13,11 @@ export interface GameLibrary {
   status: status;
   added_at: string | null;
   game_type: string | null;
-  raiting: number;
+  rating: number;
 }
 
 export interface addGame {
   ownership: owner;
   status: status;
-  raiting: number;
+  rating: number;
 }

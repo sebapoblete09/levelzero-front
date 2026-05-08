@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Navbar from "@/components/layout/Navbar";
 import { getUserProfile } from "@/actions/user";
 import { UserProvider } from "@/providers/UserContext";
+import Footer from "@/components/layout/Footer";
 
 export default async function MainLayout({
   children,
@@ -23,9 +24,8 @@ export default async function MainLayout({
     <UserProvider initialUser={userProfile}>
       <div className="flex min-h-screen flex-col">
         <Navbar />
-        <main className="flex-1">
-          {children}
-        </main>
+        <main className="flex-1">{children}</main>
+        <Footer />
       </div>
     </UserProvider>
   );
