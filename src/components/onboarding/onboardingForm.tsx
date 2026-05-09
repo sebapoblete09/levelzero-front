@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { UserUpdate, Platform } from "@/types/user";
 import { createClient } from "@/lib/supabase/client";
 import { platforms } from "@/const/platform";
-
+import { PlatformSelector } from "@/components/ui/PlatformSelector";
 import { updateUserProfile } from "@/actions/user";
 import { useRouter } from "next/navigation";
 
@@ -15,26 +15,24 @@ export default function OnboardingForm({
 }: {
   initialName: string;
 }) {
-  const supabase = createClient(); // Inicializamos Supabase
+  const supabase = createClient();
   const AVAILABLE_PLATFORMS = platforms;
   const [error, setError] = useState<string>("");
   const router = useRouter();
 
   const [formData, setFormData] = useState<UserUpdate>({
     username: "",
-    display_name: initialName || "", // Lo iniciamos vacío
+    display_name: initialName || "",
     preferred_platforms: [],
     onboarding_completed: true,
   });
 
-  // Si el contexto tarda unos milisegundos en cargar, esto asegura que el input se llene
   useEffect(() => {
     const fetchGoogleData = async () => {
       const {
         data: { user },
       } = await supabase.auth.getUser();
 
-      // Google guarda el nombre en 'full_name' dentro de 'user_metadata'
       if (user?.user_metadata?.full_name) {
         setFormData((prev) => ({
           ...prev,
@@ -48,10 +46,7 @@ export default function OnboardingForm({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-
-    // Limpiamos el error si el usuario empieza a escribir de nuevo
     if (error) setError("");
-
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -71,12 +66,11 @@ export default function OnboardingForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(""); // Reiniciamos el error
+    setError("");
 
     const rawUsername = formData.username.trim();
     const rawDisplayName = formData.display_name.trim();
 
-    // --- 1. VALIDACIONES ---
     if (!rawUsername || !rawDisplayName) {
       setError("El Nombre y el Gamer Tag son obligatorios.");
       return;
@@ -87,7 +81,6 @@ export default function OnboardingForm({
       return;
     }
 
-    // Expresión regular: Solo permite letras (mayúsculas y minúsculas), números y guiones bajos
     const usernameRegex = /^[a-zA-Z0-9_]+$/;
     if (!usernameRegex.test(rawUsername)) {
       setError(
@@ -96,21 +89,12 @@ export default function OnboardingForm({
       return;
     }
 
-    // --- 2. FORMATEO DE DATOS ---
-    // Nos aseguramos de que el username lleve el "@" antes de mandarlo al backend
     const finalDataToSend = {
       ...formData,
       username: `@${rawUsername}`,
       display_name: rawDisplayName,
     };
 
-    console.log("Datos validados listos para el backend:", finalDataToSend);
-
-    // ==========================================
-    // 🔌 AQUÍ CONECTARÁS TU SERVER ACTION
-    // const result = await updateUserProfile(finalDataToSend);
-    // if (result.success) router.push('/');
-    // ==========================================
     const result = await updateUserProfile(finalDataToSend);
 
     if (!result) {
@@ -120,14 +104,12 @@ export default function OnboardingForm({
       return;
     }
 
-    // 2. Ahora TypeScript sabe que 'result' existe de forma segura
     if (!result.success) {
-      // Usamos String() por si el error viene en otro formato
       setError(String(result.error));
       return;
     }
-    alert("Onboarding completado");
 
+    alert("Onboarding completado");
     router.push("/");
   };
 
@@ -149,7 +131,6 @@ export default function OnboardingForm({
         </p>
 
         <div className="space-y-6">
-          {/* Campo Display Name */}
           <div className="space-y-2">
             <label className="text-sm font-bold text-white uppercase tracking-wider block">
               Nombre a Mostrar
@@ -164,13 +145,11 @@ export default function OnboardingForm({
             />
           </div>
 
-          {/* Campo Username con el "@" fijo en la UI */}
           <div className="space-y-2">
             <label className="text-sm font-bold text-white uppercase tracking-wider block">
               Gamer Tag (Único)
             </label>
             <div className="flex relative">
-              {/* El arroba fijo visual */}
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-calypso-DEFAULT font-bold font-mono">
                 @
               </span>
@@ -180,7 +159,6 @@ export default function OnboardingForm({
                 value={formData.username}
                 onChange={handleChange}
                 placeholder="seba_dev"
-                // Añadimos pl-8 (padding-left) para que el texto empiece después del "@"
                 className="h-12 pl-8 bg-purple-900/10 border-2 border-purple-900/50 focus-visible:ring-0 focus-visible:border-calypso-DEFAULT text-white rounded-none font-mono transition-colors w-full"
               />
             </div>
@@ -189,43 +167,18 @@ export default function OnboardingForm({
             </p>
           </div>
 
-          {/* Mensaje de Error Visual */}
           {error && (
             <div className="bg-red-900/30 border border-red-500 p-3 text-red-400 text-sm font-bold animate-pulse">
               [ERROR] {error}
             </div>
           )}
 
-          {/* Campo Plataformas */}
-          <div className="space-y-3 pt-2">
-            <label className="text-sm font-bold text-white uppercase tracking-wider block">
-              Plataformas Base
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {AVAILABLE_PLATFORMS.map((platform) => {
-                const isSelected = formData.preferred_platforms.some(
-                  (p) => p.id === platform.id,
-                );
-                return (
-                  <button
-                    key={platform.id}
-                    type="button"
-                    onClick={() => togglePlatform(platform)}
-                    className={`px-3 py-2 text-xs font-bold uppercase font-mono transition-all border-2 rounded-none
-                      ${
-                        isSelected
-                          ? "bg-calypso-DEFAULT text-black border-calypso-DEFAULT shadow-[4px_4px_0px_0px_var(--color-purple-DEFAULT)] translate-y-[-2px] translate-x-[-2px]"
-                          : "bg-black text-muted-foreground border-purple-900/50 hover:border-calypso-DEFAULT/50 hover:text-white"
-                      }`}
-                  >
-                    {platform.name}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          <PlatformSelector
+            platforms={AVAILABLE_PLATFORMS}
+            selectedPlatforms={formData.preferred_platforms}
+            onToggle={togglePlatform}
+          />
 
-          {/* Botón de Submit */}
           <Button
             type="submit"
             className="w-full group relative h-14 bg-white text-black hover:bg-calypso-DEFAULT rounded-none border-2 border-transparent hover:border-white transition-all overflow-hidden mt-8"

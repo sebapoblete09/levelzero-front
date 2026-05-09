@@ -39,6 +39,7 @@ export interface Game extends GameCard {
   ownership: owner | null;
   player_perspectives: string[] | [];
   rating: number | null;
+  lzrating: number | null;
   screenshots: string[] | [];
   storyline: string;
   summary: string;

@@ -45,7 +45,7 @@ export default function CurrentlyPlaying({ user }: CurrentlyPlayingProps) {
       {/* Contenido */}
       <div className="relative z-10">
         {isLoading ? (
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[1, 2].map((i) => (
               <div
                 key={i}
@@ -54,7 +54,7 @@ export default function CurrentlyPlaying({ user }: CurrentlyPlayingProps) {
             ))}
           </div>
         ) : games && games.length > 0 ? (
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {games.map((game: GameLibrary) => (
               <GameCard key={game.igdb_id} game={libraryGameData(game)} />
             ))}

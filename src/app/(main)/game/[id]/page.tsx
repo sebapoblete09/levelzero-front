@@ -1,22 +1,17 @@
 import { getGameById } from "@/actions/games";
-import Image from "next/image";
-import { Game } from "@/types/games";
-import AddToListButton from "@/components/game/addGame";
+import { GameCover } from "@/components/game/GameCover";
+import { GameInfo } from "@/components/game/GameInfo";
+import { GameMedia } from "@/components/game/GameMedia";
 import noGame from "@/components/game/noGame";
-import CollapsibleLanguages from "@/components/game/CollapsibleLanguages";
-import CollapsibleSection from "@/components/game/CollapsibleSection";
-import { formatDate } from "@/utils/game-helpers";
-// En un Server Component, Next.js nos pasa los 'params' (como el ID de la URL) automáticamente
+
 export default async function GameDetailPage({
   params,
 }: {
   params: { id: string };
 }) {
-  // 1. Extraemos el ID de los parámetros y lo convertimos a número
   const resolvedParams = await params;
   const gameId = parseInt(resolvedParams.id, 10);
 
-  // 2. Si alguien escribe texto en lugar de un número en la URL (/game/hola), lo atajamos
   if (isNaN(gameId)) {
     return (
       <div className="p-10 text-center text-red-500 font-mono">
@@ -25,290 +20,31 @@ export default async function GameDetailPage({
     );
   }
 
-  // 3. Hacemos el Fetch directamente aquí. ¡Sin useEffect, sin useState!
-  const game: Game | null = await getGameById(gameId);
+  const game = await getGameById(gameId);
 
-  // 4. Si la base de datos no lo encuentra (devuelve null)
   if (!game) {
     return noGame(gameId);
   }
 
-  // 6. ¡Renderizamos el juego!
-  // 1. Formateamos la fecha de lanzamiento (De Unix Timestamp a Texto Legible)
-  const formattedDate = formatDate(game.first_release_date);
-
   return (
     <main className="container mx-auto p-4 sm:p-8 min-h-screen">
       <div className="bg-black border-2 border-purple-900 p-6 sm:p-10 shadow-[12px_12px_0px_0px_var(--color-calypso-DEFAULT)]">
-        <div className="flex flex-col md:flex-row gap-8 sm:gap-12 items-center text-center md:items-start md:text-left">
-          {/* Columna Izquierda: Portada */}
-          <div className="w-full md:w-1/5 shrink-0 mx-auto md:mx-0">
-            <div className="relative aspect-[3/4] w-full border-4 border-purple-900 overflow-hidden group">
-              <Image
-                src={game.cover}
-                alt={`Portada de ${game.name}`}
-                fill
-                sizes="(max-width: 768px) 100vw, 20vw"
-                className="object-cover transition-transform duration-500 group-hover:scale-105"
-                priority
-              />
-            </div>
+        <div className="flex flex-col md:flex-row gap-6 lg:gap-12 items-start text-left">
+          <GameCover
+            game={game}
+            libraryStatus={game.library_status}
+            ownership={game.ownership}
+            rating={game.rating}
+          />
+          <GameInfo game={game} />
+        </div>
 
-            {/* Mostrar status de biblioteca si el juego ya está agregado */}
-            {game.library_status && (
-              <div className="mt-4 p-3 bg-purple-900/20 border border-purple-900/50 rounded">
-                <p className="text-sm font-mono text-calypso-DEFAULT uppercase">
-                  <span className="text-white">Estado en biblioteca:</span>{" "}
-                  {game.library_status}
-                </p>
-              </div>
-            )}
-
-            {/* Botón de Acción Principal*/}
-            <AddToListButton
-              gameId={game.id}
-              gameName={game.name}
-              isInLibrary={game.library_status !== null}
-              currentStatus={game.library_status || undefined}
-              currentOwnership={game.ownership || undefined}
-              currentRaiting={game.rating || null}
-            />
-
-            {/* Plataformas */}
-            {game.platforms && game.platforms.length > 0 && (
-              <div className="mt-8 pt-6 border-t border-purple-900/30">
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-3">
-                  Plataformas
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {game.platforms.map((platform, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-1 bg-purple-900/20 border border-calypso-DEFAULT/50 text-calypso-DEFAULT font-mono text-xs uppercase shadow-[2px_2px_0px_0px_var(--color-calypso-DEFAULT)]"
-                    >
-                      {platform}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-            {/* Géneros */}
-            {game.genres && game.genres.length > 0 && (
-              <CollapsibleSection title="Géneros">
-                <div className="flex flex-wrap gap-2">
-                  {game.genres.map((genre, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-1 bg-black border border-purple-900/80 text-white font-mono text-xs uppercase shadow-[2px_2px_0px_0px_var(--color-purple-900)]"
-                    >
-                      {genre}
-                    </span>
-                  ))}
-                </div>
-              </CollapsibleSection>
-            )}
-
-            {/* Franquicias */}
-            {game.franchises && game.franchises.length > 0 && (
-              <CollapsibleSection title="Franquicias">
-                <div className="flex flex-wrap gap-2">
-                  {game.franchises.map((franchise, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-1 bg-black border border-purple-900/80 text-white font-mono text-xs uppercase shadow-[2px_2px_0px_0px_var(--color-purple-900)]"
-                    >
-                      {franchise}
-                    </span>
-                  ))}
-                </div>
-              </CollapsibleSection>
-            )}
-
-            {/* Modos de Juego y Perspectivas */}
-            <CollapsibleSection title="Game Modes">
-              <div>
-                {/* Modos de Juego */}
-                {game.game_modes && game.game_modes.length > 0 && (
-                  <div className="mb-6">
-                    <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-3">
-                      Modos de Juego
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {game.game_modes.map((mode, index) => (
-                        <span
-                          key={index}
-                          className="px-3 py-1 bg-black border border-purple-900/80 text-white font-mono text-xs uppercase shadow-[2px_2px_0px_0px_var(--color-purple-900)]"
-                        >
-                          {mode}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Perspectivas de Jugador */}
-                {game.player_perspectives &&
-                  game.player_perspectives.length > 0 && (
-                    <div>
-                      <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-3">
-                        Perspectivas
-                      </h3>
-                      <div className="flex flex-wrap gap-2">
-                        {game.player_perspectives.map((perspective, index) => (
-                          <span
-                            key={index}
-                            className="px-3 py-1 bg-black border border-purple-900/80 text-white font-mono text-xs uppercase shadow-[2px_2px_0px_0px_var(--color-purple-900)]"
-                          >
-                            {perspective}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-              </div>
-            </CollapsibleSection>
-
-            {/* Lenguajes Soportados */}
-            {game.language_supports && game.language_supports.length > 0 && (
-              <CollapsibleLanguages languageSupports={game.language_supports} />
-            )}
-          </div>
-
-          {/* Columna Derecha: Información */}
-          <div className="w-full md:w-2/3 flex flex-col justify-start">
-            {/* Título Principal */}
-            <h1 className="hidden md:block text-4xl sm:text-6xl font-black italic uppercase tracking-tighter text-white mb-2">
-              {game.name}
-            </h1>
-
-            {/* Fila de Metadata (Fecha y Desarrolladora) */}
-            <div className="flex flex-col sm:flex-row gap-2 sm:gap-6 mb-6 border-b-2 border-purple-900/50 pb-4">
-              <div className="text-calypso-DEFAULT font-mono text-sm uppercase flex items-center">
-                <span className="text-muted-foreground mr-2 font-bold">
-                  » Lanzamiento:
-                </span>
-                {formattedDate}
-              </div>
-              <div className="text-calypso-DEFAULT font-mono text-sm uppercase flex items-center">
-                <span className="text-muted-foreground mr-2 font-bold">
-                  » Estudio:
-                </span>
-                {game.involved_companies &&
-                  game.involved_companies.length > 0 &&
-                  game.involved_companies.map((company, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-1 bg-black border border-purple-900/80 text-white font-mono text-xs uppercase shadow-[2px_2px_0px_0px_var(--color-purple-900)]"
-                    >
-                      {company}
-                    </span>
-                  ))}
-              </div>
-            </div>
-
-            {/* Resumen del juego */}
-            <CollapsibleSection title="Sinopsis">
-              {game.summary ? (
-                <div className="prose prose-invert max-w-none">
-                  <p className="text-base sm:text-lg text-gray-300 leading-relaxed">
-                    {game.summary}
-                  </p>
-                </div>
-              ) : (
-                <p className="text-muted-foreground font-mono italic">
-                  Sin descripción disponible en la base de datos.
-                </p>
-              )}
-            </CollapsibleSection>
-
-            {/* Storyline */}
-            {game.storyline && (
-              <CollapsibleSection title="Historia">
-                <div className="prose prose-invert max-w-none">
-                  <p className="text-base sm:text-lg text-gray-300 leading-relaxed">
-                    {game.storyline}
-                  </p>
-                </div>
-              </CollapsibleSection>
-            )}
-
-            {/* Rating */}
-            {game.rating && (
-              <CollapsibleSection title="Puntuación">
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl font-bold text-calypso-DEFAULT">
-                    {Math.round(game.rating)}
-                  </span>
-                  <span className="text-sm text-gray-400">/ 100</span>
-                </div>
-              </CollapsibleSection>
-            )}
-
-            {/* Alternative Names */}
-            {game.alternative_names && game.alternative_names.length > 0 && (
-              <CollapsibleSection title="Nombres Alternativos">
-                <div className="flex flex-wrap gap-2">
-                  {game.alternative_names.map((name, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-1 bg-black border border-purple-900/80 text-white font-mono text-xs uppercase shadow-[2px_2px_0px_0px_var(--color-purple-900)]"
-                    >
-                      {name}
-                    </span>
-                  ))}
-                </div>
-              </CollapsibleSection>
-            )}
-
-            {/* Screenshots */}
-            {game.screenshots && game.screenshots.length > 0 && (
-              <div className="mb-8">
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-3">
-                  Capturas de Pantalla
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 justify-center">
-                  {game.screenshots.slice(0, 6).map((screenshot, index) => (
-                    <div
-                      key={index}
-                      className="relative aspect-video border-2 border-purple-900 overflow-hidden group"
-                    >
-                      <Image
-                        src={screenshot}
-                        alt={`Screenshot ${index + 1} de ${game.name}`}
-                        fill
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Videos */}
-            {game.videos && game.videos.length > 0 && (
-              <div className="mb-8">
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-3">
-                  Videos
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 justify-center">
-                  {game.videos.slice(0, 4).map((video, index) => (
-                    <div
-                      key={index}
-                      className="relative aspect-video border-2 border-purple-900 overflow-hidden"
-                    >
-                      <iframe
-                        src={`https://www.youtube.com/embed/${video}`}
-                        title={`Video ${index + 1} de ${game.name}`}
-                        className="w-full h-full"
-                        allowFullScreen
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+        <div className="mt-8 pt-8 border-t border-purple-900/30">
+          <GameMedia
+            screenshots={game.screenshots}
+            videos={game.videos}
+            gameName={game.name}
+          />
         </div>
       </div>
     </main>
