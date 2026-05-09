@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { UserProfile, Platform, UserUpdate } from "@/types/user";
 import { platforms } from "@/const/platform";
+import { PlatformSelector } from "@/components/ui/PlatformSelector";
 import { updateUserProfile } from "@/actions/user";
 import { useUser } from "@/providers/UserContext";
 
@@ -181,33 +182,12 @@ export default function EditProfileModal({
               </div>
             )}
 
-            <div className="space-y-3 pt-2">
-              <label className="text-sm font-bold text-white uppercase tracking-wider block">
-                Plataformas Base
-              </label>
-              <div className="flex flex-wrap justify-center sm:justify-start gap-2">
-                {AVAILABLE_PLATFORMS.map((platform) => {
-                  const isSelected = formData.preferred_platforms.some(
-                    (p) => p.id === platform.id,
-                  );
-                  return (
-                    <button
-                      key={platform.id}
-                      type="button"
-                      onClick={() => togglePlatform(platform)}
-                      className={`px-3 py-2 text-xs font-bold uppercase font-mono transition-all border-2 rounded-none
-                        ${
-                          isSelected
-                            ? "bg-calypso-DEFAULT text-black border-calypso-DEFAULT shadow-[4px_4px_0px_0px_var(--color-purple-DEFAULT)] translate-y-[-2px] translate-x-[-2px]"
-                            : "bg-black text-muted-foreground border-purple-900/50 hover:border-calypso-DEFAULT/50 hover:text-white"
-                        }`}
-                    >
-                      {platform.name}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+            <PlatformSelector
+              platforms={AVAILABLE_PLATFORMS}
+              selectedPlatforms={formData.preferred_platforms}
+              onToggle={togglePlatform}
+              label="Plataformas Base"
+            />
 
             <Button
               type="submit"
