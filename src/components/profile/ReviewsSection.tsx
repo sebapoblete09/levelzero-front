@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { getUserReviews } from "@/actions/reviews";
 import { Review } from "@/types/review";
+import Image from "next/image";
 
 export function ReviewsSection() {
   const { data: reviews, isLoading } = useQuery({
@@ -57,15 +58,35 @@ export function ReviewsSection() {
               key={index}
               className="rounded-xl border border-purple-900/30 bg-zinc-950/80 p-4"
             >
-              <div className="flex items-center justify-between mb-2">
-                <a
-                  href={`/game/${review.igdb_id}`}
-                  className="text-calypso-DEFAULT font-bold uppercase hover:underline"
-                >
-                  Ver Juego (ID: {review.igdb_id})
-                </a>
+              <div className="flex items-start justify-between mb-4 gap-4">
+                {/* Grupo Izquierdo: Portada + Nombre del juego */}
+                <div className="flex items-center gap-4">
+                  <a
+                    href={`/game/${review.igdb_id}`}
+                    className="group relative h-20 w-14 flex-shrink-0 overflow-hidden rounded border border-purple-900/50 bg-zinc-900 sm:h-24 sm:w-16"
+                  >
+                    {review.cover && (
+                      <Image
+                        src={review.cover}
+                        alt={`Portada de ${review.name}`}
+                        fill
+                        sizes="(max-width: 768px) 56px, 64px"
+                        className="object-cover object-center transition-transform duration-300 group-hover:scale-110"
+                      />
+                    )}
+                  </a>
+
+                  <a
+                    href={`/game/${review.igdb_id}`}
+                    className="text-calypso-DEFAULT font-bold uppercase hover:underline sm:text-lg line-clamp-2"
+                  >
+                    {review.name}
+                  </a>
+                </div>
+
+                {/* Grupo Derecho: Tag de Spoiler */}
                 {review.is_spoiler && (
-                  <span className="px-2 py-1 text-xs font-bold uppercase bg-red-900/30 border border-red-500 text-red-400">
+                  <span className="flex-shrink-0 px-2 py-1 text-[10px] sm:text-xs font-bold uppercase tracking-widest bg-red-900/30 border border-red-500 text-red-400 mt-1">
                     Spoiler
                   </span>
                 )}
