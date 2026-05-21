@@ -36,8 +36,9 @@ export default function UserDashboard() {
         <div></div>
       </div>
 
-      {/* 4. Actividad reciente */}
+      {/* 4. Actividad reciente 
       <RecentGames />
+      */}
     </div>
   );
 }
