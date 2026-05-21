@@ -65,10 +65,14 @@ export function UserMenu({ user, onLogout }: UserMenuProps) {
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem className="cursor-pointer hover:bg-purple-900/30 text-white rounded-lg mx-1 my-1">
-            Biblioteca
+            <Link href="/library" className="block w-full h-full py-2 px-4">
+              Biblioteca
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuItem className="cursor-pointer hover:bg-purple-900/30 text-white rounded-lg mx-1 my-1">
-            Configuración
+            <Link href="/reviews" className="block w-full h-full py-2 px-4">
+              Mis Reseñas
+            </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
 
